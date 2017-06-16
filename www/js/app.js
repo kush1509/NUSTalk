@@ -38,6 +38,16 @@ angular.module('NUSTalk', ['ionic', 'NUSTalk.controllers', 'NUSTalk.services'])
         }
       })
 
+      .state('NUSTalk.settings', {
+        url: '/settings',
+        views: {
+          'NUSTalkSideMenu': {
+            templateUrl: 'templates/settings.html',
+            controller: 'SettingsController'
+          }
+        }
+      })
+
       .state('NUSTalk.module', {
         url: '/module/:moduleName',
         views: {

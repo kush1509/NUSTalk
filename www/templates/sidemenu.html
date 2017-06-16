@@ -14,9 +14,12 @@
 
   <ion-side-menu side="left">
     <ion-content>
-      <img src="www/img/placeholder-user-image.png" class="user-image"/>
+      <img ng-src="www/img/placeholder-user-image.png" class="user-image"/>
       <h2>User</h2>
       <ion-list>
+        <ion-item menu-close href="#/NUSTalk/home">
+          Home
+        </ion-item>
         <ion-item menu-close ng-click="loginOrLogout(hasLoggedIn)">
           {{ hasLoggedIn && 'Logout' || 'Login'}}
         </ion-item>
