@@ -75,7 +75,17 @@ angular.module('NUSTalk.controllers', [])
     $scope.currentModule = {
       name: $stateParams.moduleName
     }
+  })
 
+  .controller('NUSModsAPIController', function(NUSModsModuleData) {
+    var thisData = this;
+
+    NUSModsModuleData.getSomeData().then(function(response){
+      //do something with response
+      thisData.data = response.data;
+    }).catch(function(response){
+      //handle the error
+    });
   })
 
   .controller('SettingsController', function($scope) {

@@ -1,7 +1,12 @@
 angular.module('NUSTalk.services', [])
 
   .factory('NUSModsAPIService', function($http) {
-
+    var url = '';
+    return {
+      getModuleData: function() {
+        return $http.jsonp(url);
+      }
+    }
   })
 
   .factory('Socket', function(socketFactory){
