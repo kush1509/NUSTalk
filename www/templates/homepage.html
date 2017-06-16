@@ -1,0 +1,18 @@
+<ion-view view-title="NUSTalk">
+  <ion-nav-bar class="bar-positive">
+    <ion-nav-buttons>
+      <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+  </ion-nav-bar>
+
+  <ion-content class="has-header">
+    <!--displays list of modules-->
+    <!--TODO: make list editable-->
+      <ion-list>
+        <ion-item ng-href='#/NUSTalk/module/{{module.name}}' ng-repeat="module in modules">
+          {{ module.name }}
+        </ion-item>
+      </ion-list>
+    <ion-content>
+</ion-view>
+
