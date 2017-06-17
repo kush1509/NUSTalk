@@ -26,7 +26,6 @@ angular.module('NUSTalk.controllers', [])
     // close logout modal
     $scope.closeLogoutModal = function() {
       $scope.logoutModal.hide();
-      $scope.logoutModal.remove();
     };
 
     // user logout
