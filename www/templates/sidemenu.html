@@ -20,13 +20,14 @@
         <ion-item menu-close href="#/NUSTalk/home">
           Home
         </ion-item>
-        <ion-item menu-close ng-click="loginOrLogout(hasLoggedIn)">
-          {{ hasLoggedIn && 'Logout' || 'Login'}}
-        </ion-item>
         <ion-item menu-close href="#/NUSTalk/settings">
           Settings
         </ion-item>
       </ion-list>
+
+      <button menu-close class="button button-block button-assertive" ng-if="!user.hasLoggedIn" ng-click="showLogin()"> Login </button>
+      <button menu-close class="button button-block button-assertive" ng-if="user.hasLoggedIn" ng-click="showLogoutModal()"> Logout </button>
+
     </ion-content>
   </ion-side-menu>
 </ion-side-menus>

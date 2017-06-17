@@ -6,10 +6,18 @@
   </ion-nav-back-button>
 
   <ion-nav-buttons side="right">
-   <button ng-click="goToInfo()" class="button button-icon icon ion-information-circled"></button>
+   <button ng-click="goToInfo()" class="button button-icon button-small ion-information-circled"></button>
   </ion-nav-buttons>
 </ion-nav-bar>
 
   <ion-content class="has-header">
+    <!--TODO: show list of active chats here-->
+    <ion-list class="chats-list">
+      <ion-item class="item item-avatar-left" ng-repeat="chat in chats">
+        <img ng-src="{{ chat.face }}">
+        <h2>{{ chat.name }}</h2>
+        <p>{{ chat.lastText }}</p>
+      </ion-item>
+    </ion-list>
   <ion-content>
 </ion-view>

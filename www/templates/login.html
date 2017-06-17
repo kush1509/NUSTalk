@@ -1,9 +1,20 @@
-<ion-modal-view>
+<ion-view>
   <ion-header-bar>
     <h1 class="title">Login</h1>
     <div class="buttons">
+      <button class="button icon ion-close-round pull-right" ng-click="cancel()"></button>
     </div>
   </ion-header-bar>
   <ion-content>
+    <form name="loginForm" ng-submit="loginUser()">
+      <label class="item item-input">
+        <input type="email" placeholder="Email">
+      </label>
+      <label class="item item-input">
+        <input type="password" placeholder="Password">
+      </label>
+    </form>
+    <button class="button button-block button-positive" ng-click="loginUser()"> Sign In </button>
+    <button class="button button-block button-calm" ng-click="showSignUp()"> Sign up for an account </button>
   </ion-content>
-</ion-modal-view>
+</ion-view>

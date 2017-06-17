@@ -1,0 +1,23 @@
+<ion-view>
+  <ion-header-bar>
+    <h1 class="title">Sign Up</h1>
+    <div class="buttons">
+      <button class="button icon ion-close-round pull-right" ng-click="cancel()"></button>
+    </div>
+  </ion-header-bar>
+  <ion-content>
+    <form name="signupForm" ng-submit="signUpUser()">
+      <label class="item item-input">
+        <input type="text" placeholder="Name">
+      </label>
+      <label class="item item-input">
+        <input type="email" placeholder="Email">
+      </label>
+      <label class="item item-input">
+        <input type="password" placeholder="Password">
+      </label>
+    </form>
+    <button class="button button-block button-positive" ng-click="signUpUser()"> Sign Up </button>
+    <button class="button button-block button-calm" ng-click="showLogin()"> Already have an account? </button>
+  </ion-content>
+</ion-view>

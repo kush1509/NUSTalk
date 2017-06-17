@@ -1,54 +1,60 @@
 angular.module('NUSTalk.controllers', [])
-  .controller('AppController', function($scope, $ionicModal) {
-    $scope.hasLoggedIn = false;
+  .controller('AppController', function($scope, $state, $ionicModal) {
+    $scope.user = {
+      name: '',
+      email: '',
+      password: '',
+      hasLoggedIn: false
+    };
 
-    // LOGIN MODAL
-    $ionicModal.fromTemplateUrl('templates/login.html', {
-      scope: $scope
-    }).then(function(modal) {
-      $scope.loginModal = modal;
-    });
+    $scope.showLogin = function(){
+      $state.go('NUSTalk.login');
+    };
 
-    // LOGOUT MODAL
+    // logout modal
     $ionicModal.fromTemplateUrl('templates/logout.html', {
       scope: $scope
     }).then(function(modal) {
       $scope.logoutModal = modal;
     });
 
-    // close modal
-    var closeModal = function(hasLoggedIn) {
-      if(hasLoggedIn) {
-        $scope.logoutModal.hide();
-        $scope.logoutModal.remove();
-      } else {
-        $scope.loginModal.hide();
-        $scope.loginModal.remove();
-      }
+    // show logout modal
+    $scope.showLogoutModal = function() {
+      $scope.logoutModal.show();
     };
 
-    // show login modal
-    var showModal = function(hasLoggedIn) {
-      if(hasLoggedIn) {
-        $scope.logoutModal.show();
-      } else {
-        $scope.loginModal.show();
-      }
+    // close logout modal
+    $scope.closeLogoutModal = function() {
+      $scope.logoutModal.hide();
+      $scope.logoutModal.remove();
     };
 
-    $scope.loginOrLogout = function(hasLoggedIn) {
-      if(hasLoggedIn) {
-        // show logout
-        showModal(hasLoggedIn);
-        //TODO: update flag only if user logs out
-        $scope.hasLoggedIn = false;
-      } else {
-        // show login
-        showModal(hasLoggedIn);
-        //TODO: update flag only if user logs in
-        $scope.hasLoggedIn = true;
-      }
-    }
+    // user logout
+    $scope.logoutUser = function() {
+      $scope.user.hasLoggedIn = false;
+      $scope.closeLogoutModal();
+    };
+  })
+
+  .controller('LoginController', function($scope, $state) {
+    // user login
+    $scope.loginUser = function() {
+      $scope.user.hasLoggedIn = true;
+      $state.go('NUSTalk.home');
+    };
+
+    $scope.showSignUp = function() {
+      $state.go('NUSTalk.signup');
+    };
+  })
+
+  .controller('SignUpController', function($scope) {
+    // user signup
+    $scope.signUpUser = function() {
+      // get data
+      // show login page after adding user
+      $scope.showLogin();
+    };
   })
 
   .controller('HomeController', function($scope) {
@@ -61,20 +67,22 @@ angular.module('NUSTalk.controllers', [])
       {id:5, name:'CS1050'}];
   })
 
-  .controller('ModuleController', function($scope, $state, $stateParams) {
+  .controller('ModuleController', function($scope, $state, $stateParams, Socket, Users, Chats, Chat) { // add
     $scope.currentModule = {
       name: $stateParams.moduleName
     };
 
+    $scope.chats = Chats.all();
+
     $scope.goToInfo = function() {
       $state.go('NUSTalk.info', { moduleName: $stateParams.moduleName });
-    }
+    };
   })
 
   .controller('InfoController', function($scope, $stateParams) {
     $scope.currentModule = {
       name: $stateParams.moduleName
-    }
+    };
   })
 
   .controller('NUSModsAPIController', function(NUSModsModuleData) {

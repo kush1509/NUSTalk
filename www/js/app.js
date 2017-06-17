@@ -1,4 +1,4 @@
-angular.module('NUSTalk', ['ionic', 'NUSTalk.controllers', 'NUSTalk.services'])
+angular.module('NUSTalk', ['ionic', 'NUSTalk.controllers', 'NUSTalk.services', 'LocalStorageModule', 'btford.socket-io', 'angularMoment'])
 
   .run(function($ionicPlatform) {
     $ionicPlatform.ready(function() {
@@ -26,6 +26,26 @@ angular.module('NUSTalk', ['ionic', 'NUSTalk.controllers', 'NUSTalk.services'])
         abstract: true,
         templateUrl: 'templates/sidemenu.html',
         controller: 'AppController'
+      })
+
+      .state('NUSTalk.login', {
+        url: '/login',
+        views: {
+          'NUSTalkSideMenu': {
+            templateUrl: 'templates/login.html',
+            controller: 'LoginController'
+          }
+        }
+      })
+
+      .state('NUSTalk.signup', {
+        url: '/signup',
+        views: {
+          'NUSTalkSideMenu': {
+            templateUrl: 'templates/signup.html',
+            controller: 'SignUpController'
+          }
+        }
       })
 
       .state('NUSTalk.home', {
