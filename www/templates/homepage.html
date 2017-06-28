@@ -1,0 +1,21 @@
+<ion-view view-title="{{userName}}">
+  <ion-nav-bar class="bar-positive">
+    <ion-nav-buttons>
+      <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+
+    <ion-nav-buttons side="right">
+      <button class="button icon ion-search pull-right"></button>
+    </ion-nav-buttons>
+  </ion-nav-bar>
+
+  <ion-content class="has-header">
+    <!--displays list of modules-->
+    <!--TODO: make list editable-->
+      <ion-list class="module-list">
+        <ion-item class='card item-text-wrap' ng-href='#/NUSTalk/module/{{module.CourseCode}}' ng-repeat="module in modules track by $index"  ng-click = "setCurrentModule(module)" >
+         {{module.CourseCode}} : {{ module.CourseName}}
+        </ion-item>
+      </ion-list>
+    <ion-content>
+</ion-view>

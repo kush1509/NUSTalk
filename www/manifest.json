@@ -1,0 +1,12 @@
+{
+  "name": "NUSTalk",
+  "short_name": "NUSTalk",
+  "start_url": "index.html",
+  "display": "standalone",
+  "icons": [{
+    "src": "./img/nusTalkicon.webp",
+    "sizes": "512x512",
+    "type": "image/webp"
+  }],
+  "gcm_sender_id": "103953800507"
+}

@@ -1,0 +1,44 @@
+<ion-modal-view>
+	<ion-header-bar class="bar bar-header bar-positive">
+	  <h1 class="title">New Chat</h1>
+	  <button class="button button-clear button-primary" ng-click="closeNewChatModal()">Cancel</button>
+	</ion-header-bar>
+	<ion-content class="scroll-content ionic-scroll">
+	   	<ion-list>
+	       	<ion-item ng-click="toggleQuery(lecturers)"
+	            ng-class="{active: isQueryShown(lecturers)}">
+				<i class="icon" ng-class="isQueryShown(lecturers) ? 'ion-chevron-down' : 'ion-chevron-right'"></i>
+					Lecturers
+			</ion-item>		
+	           <ion-list class="lecturer-list" class="item-accordion" ng-show="isQueryShown(lecturers)" item-text-wrap>
+			        <ion-item ng-click="goToChat(lecturer.User)" ng-repeat="lecturer in lecturers.list track by $index">
+			        {{lecturer.User.Name}}
+			        </ion-item>
+		      </ion-list>
+		      <ion-item ng-click="toggleQuery(tutors)"
+	            ng-class="{active: isQueryShown(tutors)}">
+				<i class="icon" ng-class="isQueryShown(tutors) ? 'ion-chevron-down' : 'ion-chevron-right'"></i>
+					Tutors and Teaching Assistants
+			</ion-item>		
+	           <ion-list class="tutor list" class="item-accordion" ng-show="isQueryShown(tutors)" item-text-wrap>
+			        <ion-item ng-click="goToChat(tutor.User)" ng-repeat="tutor in tutors.list track by $index">
+			        {{tutor.User.Name}}
+			        </ion-item>
+			       
+		      </ion-list>
+		      	<ion-item ng-click="toggleQuery(classRoster)"
+	            ng-class="{active: isQueryShown(classRoster)}">
+				<i class="icon" ng-class="isQueryShown(classRoster) ? 'ion-chevron-down' : 'ion-chevron-right'"></i>
+					Tutorial Group Peers
+			</ion-item>		
+	           <ion-list class="class list" class="item-accordion" ng-show="isQueryShown(classRoster)" item-text-wrap>
+			        <ion-item ng-click="goToChat(peer)" ng-repeat="peer in classRoster.list track by $index" > <!--ng-show="peer.Name!==userName">-->
+			        {{peer.Name}}
+			        </ion-item>
+		      </ion-list>
+
+		     
+
+		 </ion-list>     
+	</ion-content>
+	</ion-modal-view>

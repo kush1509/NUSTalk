@@ -1,0 +1,43 @@
+<ion-view view-title="{{otherUser.Name}}">
+	
+	<ion-nav-bar class="bar-positive">
+  <ion-nav-back-button class="button-clear">
+    <i class="ion-chevron-left"></i> Chats
+  </ion-nav-back-button>
+  
+	<ion-content class="content-stable"
+                 on-swipe-left="hideTime = false"
+                 on-swipe-right="hideTime = true" id='messages'
+                 >
+
+        
+		<div ng-repeat="message in messages"
+           ng-class="{other: (message.sender == otherUser.Name)}"
+           class="messages">
+		   
+		   	<div class="message">
+				<span class="msg">{{ message.message }}</span>
+			</div>
+
+			<!--
+			<div class="message" ng-class="{'slide-right': hideTime, '': !hideTime}">
+				<span >{{ message.text }}</span>
+			</div>
+			
+			<div class="time" ng-class="{'slide-right': hideTime,'' : !hideTime}">{{message.time}}</div>
+			-->
+
+		</div>
+		
+	</ion-content>
+	<form name="sendMessageForm" ng-submit="sendMessage(message)" novalidate name="msgForm">
+	<ion-footer-bar keyboard-attach class="bar-positive item-input-inset">
+		<label class="item-input-wrapper">
+			<input type="text" placeholder="Type your message" ng-model="message"/>
+		</label>
+		<button class="button button-icon button-small ion-paper-airplane" type="submit" ng-disabled="!message || message === ''">
+		</button>	
+	</ion-footer-bar>
+	<form>
+	
+</ion-view>

@@ -1,0 +1,23 @@
+<ion-view view-title='{{ currentModule.CourseCode + " : Chats"}}'>
+
+<ion-nav-bar class="bar-positive">
+  <ion-nav-back-button class="button-clear">
+    <i class="ion-chevron-left"></i> Home
+  </ion-nav-back-button>
+
+  <ion-nav-buttons side="right">
+   <button ng-click="newChat()" class="button button-icon button-small ion-compose"></button>
+  </ion-nav-buttons>
+</ion-nav-bar>
+
+  <ion-content class="has-header">
+     <ion-list class="chats-list">
+      <ion-item class="item item-avatar-left" ng-repeat="chat in chats" ng-click ='goToChat(chat)'>
+        <h2>{{ chat.Name }}</h2>
+        <p>{{ chat.lastText }}</p>
+      </ion-item>
+    </ion-list>
+  <ion-content>
+    
+  <ion-content>
+</ion-view>
