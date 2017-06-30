@@ -13,11 +13,10 @@
   <ion-content class="has-header">
      <ion-list class="chats-list">
       <ion-item class="item item-avatar-left" ng-repeat="chat in chats" ng-click ='goToChat(chat)'>
+        <img src="./img/default-user.png">
         <h2>{{ chat.Name }}</h2>
         <p>{{ chat.lastText }}</p>
       </ion-item>
     </ion-list>
-  <ion-content>
-    
-  <ion-content>
+  </ion-content>
 </ion-view>

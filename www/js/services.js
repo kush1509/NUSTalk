@@ -41,27 +41,38 @@ angular.module('NUSTalk.services',['firebase'])
 
 	.service('ModuleService', function(){
 
-		var modules = [];
+		var studentModules = [];
+		var staffModules = [];
 		var currentModule = {};
 
-		var setModules = function(data) {
-		    modules = data;
+		var setStudentModules = function(data) {
+		    studentModules = data;
 		};
 
-		var getModules = function(){
-		    return modules;
+		var getStudentModules = function(){
+		    return studentModules;
+ 	    };
+
+ 	    var setStaffModules = function(data) {
+		    staffModules = data;
+		};
+
+		var getStaffModules = function(){
+		    return staffModules;
  	    };
 
  	    var setCurrentModule = function(data){
  	    	currentModule = data;
- 	    }
+ 	    };
 
  	    var getCurrentModule = function(){
  	    	return currentModule;
- 	    }
+ 	    };
 		  return {
-		    setModules: setModules,
-		    getModules: getModules,
+		    setStudentModules: setStudentModules,
+		    getStudentModules: getStudentModules,
+		    setStaffModules: setStaffModules,
+		    getStaffModules: getStaffModules,
 		    setCurrentModule: setCurrentModule,
 		    getCurrentModule: getCurrentModule
 		  };

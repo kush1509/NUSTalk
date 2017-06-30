@@ -59,6 +59,7 @@ angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'n
 
       .state('NUSTalk.module', {
         url: '/module/:moduleName',
+        cache: false,
         views: {
           'NUSTalkSideMenu': {
             templateUrl: 'templates/module.html',

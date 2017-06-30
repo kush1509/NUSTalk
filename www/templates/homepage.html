@@ -12,10 +12,23 @@
   <ion-content class="has-header">
     <!--displays list of modules-->
     <!--TODO: make list editable-->
+    <h3 ng-show="!studentModules.length==0">Enrolled Modules</h3>
       <ion-list class="module-list">
-        <ion-item class='card item-text-wrap' ng-href='#/NUSTalk/module/{{module.CourseCode}}' ng-repeat="module in modules track by $index"  ng-click = "setCurrentModule(module)" >
+        <ion-item class='card item-text-wrap' ng-href='#/NUSTalk/module/{{module.CourseCode}}' ng-repeat="module in studentModules track by $index"  ng-click = "setCurrentModule(module)" >
          {{module.CourseCode}} : {{ module.CourseName}}
         </ion-item>
       </ion-list>
-    <ion-content>
+
+      <h3 ng-show="!staffModules.length==0">Teaching Modules</h3>
+      <ion-list class="module-list">
+        <ion-item class='card item-text-wrap' ng-href='#/NUSTalk/module/{{module.CourseCode}}' ng-repeat="module in staffModules track by $index"  ng-click = "setCurrentModule(module)" >
+         {{module.CourseCode}} : {{ module.CourseName}}
+        </ion-item>
+      </ion-list>
+    </ion-content>
+      <div class="float-button button card" ng-click="goToChat()">
+        <span class="height-fix">
+          <a class="content">BOT</a>
+        </span>
+      </div>
 </ion-view>

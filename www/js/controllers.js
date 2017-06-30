@@ -83,7 +83,6 @@ angular.module('NUSTalk.controllers',['firebase'])
 
 	.controller('LoggedInCtrl', function($scope, $state, $http, User, ModuleService, Firebase){
 
-
 		$http.get('https://ivle.nus.edu.sg/api/Lapi.svc/UserName_Get?APIKey=JWE5l4plZpPkhqENrgaVx&Token='+User.getToken(), { cache: false })
 			.then(function(result){
 				console.log(result);
@@ -105,40 +104,58 @@ angular.module('NUSTalk.controllers',['firebase'])
  						UserRef.child(result.data).set({
  							Name: result.data
  						});
- 				  }
+				  }
  				});
 				
 				User.setUserName(result.data);
 		});
 
-		$http.get('https://ivle.nus.edu.sg/api/Lapi.svc/Modules?APIKey=JWE5l4plZpPkhqENrgaVx&AuthToken='+User.getToken()+'&Duration=0&IncludeAllInfo=false', { cache: false })
+		$http.get('https://ivle.nus.edu.sg/api/Lapi.svc/Modules_Staff?APIKey=JWE5l4plZpPkhqENrgaVx&AuthToken='+User.getToken()+'&Duration=0&IncludeAllInfo=false', { cache: false })
 			.then(function(result){
 				console.log(result);
-				ModuleService.setModules(result.data.Results);
+				ModuleService.setStaffModules(result.data.Results);
+			});
+
+		$http.get('https://ivle.nus.edu.sg/api/Lapi.svc/Modules_Student?APIKey=JWE5l4plZpPkhqENrgaVx&AuthToken='+User.getToken()+'&Duration=0&IncludeAllInfo=false', { cache: false })
+			.then(function(result){
+				console.log(result);
+				ModuleService.setStudentModules(result.data.Results);
 				$state.go('NUSTalk.home');
 			});	
 	}) 
 
-	.controller('HomeController', function($scope, User, $http, ModuleService, $state){
+	.controller('HomeController', function($scope, User, $http, ModuleService, $state, ChatService){
 		
-
-		 if(!User.getUserName())
-		 	$state.go('login');
-
 	     $scope.userName = User.getUserName();
 	     console.log($scope.userName);
 
-	   	 $scope.modules = ModuleService.getModules();
-	   	 console.log($scope.modules);
+	   	 $scope.studentModules = ModuleService.getStudentModules();
+	   	 console.log($scope.studentModules);
+
+	   	 $scope.staffModules = ModuleService.getStaffModules();
+	   	 console.log($scope.staffModules);
 
 	   	 $scope.setCurrentModule = function(data){
 	   	 	ModuleService.setCurrentModule(data);
 	   	 	console.log(data.CourseCode);
 	   	 }
+
+	   	 $scope.BOT = {
+	   	 	Name: "NUSBot"
+	   	 }
+	   	 $scope.goToChat = function(){
+	   	 		ChatService.setOtherUser($scope.BOT);
+		 		$state.go('NUSTalk.chatDetails');
+	   	 }
 	})
 
 	.controller('ModuleController', function($scope, ModuleService, $ionicModal, $http, User, ChatService, $state, $ionicScrollDelegate, Firebase){
 
+		$http.get('https://ivle.nus.edu.sg/api/DisplayPhoto.ashx?APIKey=JWE5l4plZpPkhqENrgaVx&AuthToken='+User.getToken()+'&CourseID=8e9dafa6-b9a1-4a98-801f-1bf8321cca5b&UserID=dcstantc', { cache: false })
+			.then(function(result){
+				console.log(result);
+		});
+		
 		$scope.userName = User.getUserName();
 
 		$scope.currentModule = ModuleService.getCurrentModule();
@@ -152,13 +169,12 @@ angular.module('NUSTalk.controllers',['firebase'])
 		});
 
 		$scope.chats = []; 
-	//	$scope.last = "";
 
-		var UserRef = firebase.database().ref('Users/users/'+ User.getUserName()+'/Chats');
+		var UserRef = firebase.database().ref('Users/users/'+ User.getUserName() +'/' + ModuleService.getCurrentModule().CourseCode + '/Chats');
 		
 		UserRef.on('child_added', function(data) {
 			console.log('chat started with '+ data.val().Name);
-			var messagesRef = firebase.database().ref('Users/users/'+ User.getUserName()+'/Chats/'+ data.val().Name);
+			var messagesRef = firebase.database().ref('Users/users/'+ User.getUserName() +'/' + ModuleService.getCurrentModule().CourseCode + '/Chats/'+ data.val().Name);
 
 			messagesRef.limitToLast(2).on("child_added", function (snapshot) {
         		if(snapshot.key != "Name"){
@@ -170,6 +186,7 @@ angular.module('NUSTalk.controllers',['firebase'])
 			$scope.chats.unshift(
 				{Name: data.val().Name,
 				lastText: $scope.last}
+				//face: './img/default-user.png'}
 			);	
 		});
 
@@ -245,12 +262,9 @@ angular.module('NUSTalk.controllers',['firebase'])
 	    }
 	})
 
-	.controller('ChatDetailsController', function($scope, $state, ChatService, Firebase, User, $ionicScrollDelegate, $timeout, $rootScope){
+	.controller('ChatDetailsController', function($scope, $state, ChatService, Firebase, User, $ionicScrollDelegate, $timeout, $rootScope, ModuleService){
 
-	//	$scope.refresh = setInterval(function(){
-	//			$state.go('NUSTalk.chatDetails');
-	//	}, 500);
-
+		$scope.inputMessage = {};
 
 		$timeout(function() {
     		$ionicScrollDelegate.scrollBottom();
@@ -271,28 +285,51 @@ angular.module('NUSTalk.controllers',['firebase'])
 			console.log(data.time);
 			var UserRef = firebase.database().ref('Users');
 
-			UserRef.child('users').child(ChatService.getOtherUser().Name).child('Chats').child(User.getUserName()).child('Name').set(User.getUserName());
-			UserRef.child('users').child(ChatService.getOtherUser().Name).child('Chats').child(User.getUserName()).push(data);
+			if(ChatService.getOtherUser().Name != 'NUSBot'){
 
-			UserRef.child('users').child(User.getUserName()).child('Chats').child(ChatService.getOtherUser().Name).child('Name').set(ChatService.getOtherUser().Name);
-			UserRef.child('users').child(User.getUserName()).child('Chats').child(ChatService.getOtherUser().Name).push(data);
+				UserRef.child('users').child(ChatService.getOtherUser().Name).child(ModuleService.getCurrentModule().CourseCode).child('Chats').child(User.getUserName()).child('Name').set(User.getUserName());
+				UserRef.child('users').child(ChatService.getOtherUser().Name).child(ModuleService.getCurrentModule().CourseCode).child('Chats').child(User.getUserName()).push(data);
+
+				UserRef.child('users').child(User.getUserName()).child(ModuleService.getCurrentModule().CourseCode).child('Chats').child(ChatService.getOtherUser().Name).child('Name').set(ChatService.getOtherUser().Name);
+				UserRef.child('users').child(User.getUserName()).child(ModuleService.getCurrentModule().CourseCode).child('Chats').child(ChatService.getOtherUser().Name).push(data);
+			}
+			else{
+				UserRef.child('users').child('BOT').child(User.getUserName()).push(data);
+				UserRef.child('users').child(User.getUserName()).child('NUSBot').push(data);
+			}	
+			$scope.inputMessage = {};
+
 		}	
 
-		$scope.data = angular.copy({});
 
 		$scope.messages = [];
 
-		var messagesRef = firebase.database().ref('Users/users/'+ User.getUserName()+'/Chats/'+ ChatService.getOtherUser().Name);
-		
-		messagesRef.on('child_added', function(data) {
-			console.log('new message'+ data.val().message);
-			if(data.key != 'Name'){
-				$scope.messages.push(data.val());	
-				$timeout(function() {
-    			$ionicScrollDelegate.scrollBottom();
-	  			});
-			}
-		});
+		if(ChatService.getOtherUser().Name != 'NUSBot'){
+			var messagesRef = firebase.database().ref('Users/users/'+ User.getUserName() +'/' + ModuleService.getCurrentModule().CourseCode + '/Chats/'+ ChatService.getOtherUser().Name);
+			
+			messagesRef.on('child_added', function(data) {
+				console.log('new message'+ data.val().message);
+				if(data.key != 'Name'){
+					$scope.messages.push(data.val());	
+					$timeout(function() {
+	    			$ionicScrollDelegate.scrollBottom();
+		  			});
+				}
+			});
+		}
+		else{
+			var messagesRef = firebase.database().ref('Users/users/'+ User.getUserName() +'/NUSBot');
+			
+			messagesRef.on('child_added', function(data) {
+				console.log('new message'+ data.val().message);
+				if(data.key != 'Name'){
+					$scope.messages.push(data.val());	
+					$timeout(function() {
+	    			$ionicScrollDelegate.scrollBottom();
+		  			});
+				}
+			});
+		}	
 
 
 	});

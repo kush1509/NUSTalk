@@ -30,14 +30,14 @@
 		</div>
 		
 	</ion-content>
-	<form name="sendMessageForm" ng-submit="sendMessage(message)" novalidate name="msgForm">
-	<ion-footer-bar keyboard-attach class="bar-positive item-input-inset">
-		<label class="item-input-wrapper">
-			<input type="text" placeholder="Type your message" ng-model="message"/>
-		</label>
-		<button class="button button-icon button-small ion-paper-airplane" type="submit" ng-disabled="!message || message === ''">
-		</button>	
-	</ion-footer-bar>
+	<form id="formID" name="sendMessageForm" ng-submit="sendMessage(inputMessage.message)" novalidate name="msgForm">
+		<ion-footer-bar keyboard-attach class="bar-positive item-input-inset">
+			<label class="item-input-wrapper">
+				<input type="text" placeholder="Type your message" ng-model="inputMessage.message"/>
+			</label>
+			<button class="button button-icon button-small ion-paper-airplane" type="submit" ng-disabled="!inputMessage.message || inputMessage.message === ''">
+			</button>	
+		</ion-footer-bar>
 	<form>
 	
 </ion-view>
