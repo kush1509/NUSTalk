@@ -80,6 +80,7 @@
     </platform>
     <plugin name="cordova-plugin-device" spec="^1.1.4" />
     <plugin name="cordova-plugin-firebase" spec="^0.1.21" />
+    <plugin name="cordova-plugin-image-picker" spec="git+https://github.com/wymsee/cordova-imagePicker.git" />
     <plugin name="cordova-plugin-inappbrowser" spec="^1.7.1" />
     <plugin name="cordova-plugin-splashscreen" spec="^4.0.3" />
     <plugin name="cordova-plugin-statusbar" spec="2.2.1" />

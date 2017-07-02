@@ -30,3 +30,34 @@ z-index: 1000;
   color: white;
   font-size: 20px;
 }/* Empty. Add your own CSS if you like */
+
+.img-circle {
+    border-radius: 50%;
+    height: 150px;
+    width: 150px;
+    position: relative;
+    display: block;
+    margin: 0 auto;
+    margin-top: 30px;
+}
+
+#sideMenuUser {
+  text-align: center;
+}
+#sideMenuId {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+#logout {
+  margin-top: 200px;
+}
+
+#HomepageHeading {
+  margin-top: 10px;
+  text-align: center;
+  margin-bottom: 5px;
+}
+.button-icon {
+  border: solid black;
+}

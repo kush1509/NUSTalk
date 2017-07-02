@@ -29,12 +29,14 @@ angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'n
       
       .state('login', {
         url: '/login',
+        cache: false,
         templateUrl: 'templates/login.html',
         controller: 'LoginCtrl'
       })
 
       .state('loggedIn',{
         url:'/loggedIn',
+        cache: false,
         templateUrl: 'templates/loggedIn.html',
         controller: 'LoggedInCtrl'
       })
@@ -43,12 +45,14 @@ angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'n
       .state('NUSTalk', {
         url: '/NUSTalk',
         abstract: true,
+        cache: false,
         templateUrl: 'templates/sidemenu.html',
         controller: 'AppController'
       })
 
       .state('NUSTalk.home', {
         url: '/home',
+        cache: false,
         views: {
           'NUSTalkSideMenu': {
             templateUrl: 'templates/homepage.html',

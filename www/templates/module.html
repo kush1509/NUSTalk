@@ -11,6 +11,8 @@
 </ion-nav-bar>
 
   <ion-content class="has-header">
+  <ion-refresher on-refresh="refresh()">
+    </ion-refresher>
      <ion-list class="chats-list">
       <ion-item class="item item-avatar-left" ng-repeat="chat in chats" ng-click ='goToChat(chat)'>
         <img src="./img/default-user.png">

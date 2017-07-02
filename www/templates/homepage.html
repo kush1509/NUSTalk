@@ -12,7 +12,7 @@
   <ion-content class="has-header">
     <!--displays list of modules-->
     <!--TODO: make list editable-->
-    <h3 ng-show="!studentModules.length==0">Enrolled Modules</h3>
+    <h3 ng-show="!studentModules.length==0" id="HomepageHeading">Enrolled Modules</h3>
       <ion-list class="module-list">
         <ion-item class='card item-text-wrap' ng-href='#/NUSTalk/module/{{module.CourseCode}}' ng-repeat="module in studentModules track by $index"  ng-click = "setCurrentModule(module)" >
          {{module.CourseCode}} : {{ module.CourseName}}

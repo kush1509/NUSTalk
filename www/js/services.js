@@ -6,7 +6,7 @@ angular.module('NUSTalk.services',['firebase'])
 	        authDomain: "nustalk1.firebaseapp.com",
 	        databaseURL: "https://nustalk1.firebaseio.com",
 	        projectId: "nustalk1",
-	        storageBucket: "nustalk1.appspot.com",
+	        storageBucket: "gs://nustalk1.appspot.com",
 	        messagingSenderId: "1001751122819"
 	      };
 	    return firebase.initializeApp(config);
@@ -29,13 +29,23 @@ angular.module('NUSTalk.services',['firebase'])
 
 		  var getUserName = function(){
 		      return userData.userName;
-		  };		  
+		  };
+
+		  var setUserId = function(data) {
+		      userData.userId = data;
+		  };
+
+		  var getUserId = function(){
+		      return userData.userId;
+		  };			  
 
 		  return {
 		    setToken: setToken,
 		    getToken: getToken,
 		    setUserName: setUserName,
-		    getUserName: getUserName
+		    getUserName: getUserName,
+		    setUserId: setUserId,
+		    getUserId: getUserId
 		  };
 	})
 

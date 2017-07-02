@@ -14,18 +14,22 @@
 
   <ion-side-menu side="left">
     <ion-content>
-     
-      <h2>{{Username}}</h2>
+     <img class="item-thumbnail img-circle" src="./img/default-user.png"></img>
+      <h4 id="sideMenuUser">{{Username}}</h4>
+      <h5 id="sideMenuId"> @{{UserId}} </h5>
       <ion-list>
-        <ion-item menu-close href="#/NUSTalk/home">
-          Home
+        <ion-item  class="item item-icon-left" menu-close href="#/NUSTalk/home">
+          <i class="icon ion-home"></i> Home
         </ion-item>
-        <ion-item menu-close href="#/NUSTalk/settings">
-          Settings
+        <ion-item  class="item item-icon-left" menu-close href="#/NUSTalk/Profile">
+          <i class="icon ion-person"></i> Profile
+        </ion-item>
+        <ion-item  class="item item-icon-left" menu-close href="#/NUSTalk/settings">
+          <i class="icon ion-ios-settings-strong"></i> Settings
         </ion-item>
       </ion-list>
       
-      <button menu-close class="button button-block button-assertive" ng-click="showLogoutModal()"> Logout </button>
+      <button menu-close class="button button-block button-assertive footer" id="logout" ng-click="logout()"> Logout </button>
 
     </ion-content>
   </ion-side-menu>
