@@ -21,7 +21,8 @@ angular.module('NUSTalk.controllers',['firebase'])
 					text: '<b>Logout</b>',
 					type: 'button-get-now',
 					onTap: function (e) {
-						localStorage.setItem("IVLEtoken", null);
+						localStorage.setItem("IVLEtoken", 'null');
+						console.log('logged out');
 						ionic.Platform.exitApp();
 					}
 				}
@@ -34,7 +35,7 @@ angular.module('NUSTalk.controllers',['firebase'])
 		
 		console.log(localStorage.getItem("IVLEtoken"));
 			
-		if(localStorage.getItem("IVLEtoken") !== null){
+		if(localStorage.getItem("IVLEtoken") !== 'null'){
 			console.log('login1');			
 			User.setToken(localStorage.getItem("IVLEtoken"));
 			console.log(localStorage.getItem("IVLEtoken"));
@@ -49,7 +50,7 @@ angular.module('NUSTalk.controllers',['firebase'])
 				var link = 'https://ivle.nus.edu.sg/api/login/?apikey=JWE5l4plZpPkhqENrgaVx&url=http://localhost:8100/';
 	 			
 	 			
-	 			/* 
+	 			 
 			    $cordovaInAppBrowser.open(link, '_blank')
 			      .then(function(event) {
 			      //  alert(event.url);
@@ -68,11 +69,11 @@ angular.module('NUSTalk.controllers',['firebase'])
 			      .catch(function(event) {
 			       	console.log('no');
 			     });
-			     */
+			     
 
 
 			     
-			     
+			    /* 
 		     var win = window.open(link);	
   			
   			var interval = setInterval(function(){
@@ -87,7 +88,7 @@ angular.module('NUSTalk.controllers',['firebase'])
 					clearInterval(interval);
   				}	
   			},1000);
-			
+			*/
 			
 			  };
 			}
