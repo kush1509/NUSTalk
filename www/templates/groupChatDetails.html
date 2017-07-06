@@ -1,4 +1,4 @@
-<ion-view view-title="{{otherUser.Name || otherUser.User.Name}}">
+<ion-view view-title="{{group.name}}">
 	
 	<ion-nav-bar class="bar-positive">
   <ion-nav-back-button class="button-clear">
@@ -12,7 +12,7 @@
 
         
 		<div ng-repeat="message in messages"
-           ng-class="{other: (message.sender == otherUser.UserID)}"
+           ng-class="{other: (message.sender !== user)}"
            class="messages">
 		   
 		   	<div class="message">

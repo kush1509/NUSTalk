@@ -9826,7 +9826,7 @@ a.button {
   -webkit-align-items: center !important;
   -ms-flex-align: center !important;
   align-items: center !important;
-  margin-bottom: 20px !important; }
+  margin-bottom: 1px !important; }
   .messages .message {
     -webkit-box-flex: 1 !important;
     -moz-box-flex: 1 !important;

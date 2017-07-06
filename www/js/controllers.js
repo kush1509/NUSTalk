@@ -73,7 +73,7 @@ angular.module('NUSTalk.controllers',['firebase'])
 
 
 			     
-			    /* 
+			    /*
 		     var win = window.open(link);	
   			
   			var interval = setInterval(function(){
@@ -100,15 +100,21 @@ angular.module('NUSTalk.controllers',['firebase'])
 		$http.get('https://ivle.nus.edu.sg/api/Lapi.svc/UserName_Get?APIKey=JWE5l4plZpPkhqENrgaVx&Token='+User.getToken(), { cache: true })
 			.then(function(result){
 				console.log(result);
+				User.setUserName(result.data);
+		});	
+
+		$http.get('https://ivle.nus.edu.sg/api/Lapi.svc/UserId_Get?APIKey=JWE5l4plZpPkhqENrgaVx&Token='+User.getToken(), { cache: true })
+			.then(function(result){
+				console.log(result);
 				
-				var UserRef = firebase.database().ref('Users').child('users');
+				var UserRef = firebase.database().ref('users');
 
 				var flag = 0;
 				UserRef.once('value', function(snapshot) {
  				 snapshot.forEach(function(childSnapshot) {
  				   	var childData = childSnapshot.val();
- 				   	console.log(childData);
- 				   	if(childData.Name == result.data){
+ 				   	console.log(childSnapshot.key);
+ 				   	if(childSnapshot.key == result.data){
  				   		console.log('same');
  				   		flag = 1;
  				   	}	
@@ -116,19 +122,19 @@ angular.module('NUSTalk.controllers',['firebase'])
  				 	if(flag == 0){
  						console.log('pushing');
  						UserRef.child(result.data).set({
- 							Name: result.data
+ 							Name: User.getUserName()
  						});
 				  }
  				});
 				
-				User.setUserName(result.data);
+				User.setUserId(result.data);
 		});
-
-		$http.get('https://ivle.nus.edu.sg/api/Lapi.svc/UserId_Get?APIKey=JWE5l4plZpPkhqENrgaVx&Token='+User.getToken(), { cache: true })
+		
+		$http.get('https://ivle.nus.edu.sg/api/Lapi.svc/Modules?APIKey=JWE5l4plZpPkhqENrgaVx&AuthToken='+User.getToken()+'&Duration=0&IncludeAllInfo=false', { cache: false })
 			.then(function(result){
 				console.log(result);
-				User.setUserId(result.data);
-			});	
+				ModuleService.setModules(result.data.Results);
+			});		
 
 		$http.get('https://ivle.nus.edu.sg/api/Lapi.svc/Modules_Staff?APIKey=JWE5l4plZpPkhqENrgaVx&AuthToken='+User.getToken()+'&Duration=0&IncludeAllInfo=false', { cache: false })
 			.then(function(result){
@@ -144,10 +150,16 @@ angular.module('NUSTalk.controllers',['firebase'])
 			});	
 	}) 
 
-	.controller('HomeController', function($scope, User, $http, ModuleService, $state, ChatService){
+	.controller('HomeController', function($scope, User, $http, ModuleService, $state, ChatService, $ionicModal){
 		
+	     $scope.showSearch = false;
+	     $scope.searched = false;
+
 	     $scope.userName = User.getUserName();
 	     console.log($scope.userName);
+
+	     $scope.modules = ModuleService.getModules();
+	   	 console.log($scope.modules);
 
 	   	 $scope.studentModules = ModuleService.getStudentModules();
 	   	 console.log($scope.studentModules);
@@ -167,9 +179,30 @@ angular.module('NUSTalk.controllers',['firebase'])
 	   	 		ChatService.setOtherUser($scope.BOT);
 		 		$state.go('NUSTalk.chatDetails');
 	   	 }
+
+	   	 $scope.search = function(){
+	   	 	console.log('search');
+	   	 	$scope.searched = false;
+	   	 	$scope.showSearch = !$scope.showSearch;
+	   	 }
+
+	   	$scope.find = function(data){
+	  		console.log(data);
+	  		data = data.toUpperCase();
+	  		$scope.searched = true;	
+	  		$scope.searchedModules = [];
+
+	  		for(var i=0 ; i < $scope.modules.length; ++i){
+	  			var module = $scope.modules[i];
+	  			console.log(module.CourseCode + " " + data);
+	  			if(module.CourseCode.indexOf(data)!=-1)
+	  				$scope.searchedModules.push(module);
+	  		}
+	  		console.log($scope.searchedModules);
+	  	}
 	})
 
-	.controller('ModuleController', function($scope, ModuleService, $ionicModal, $http, User, ChatService, $state, $ionicScrollDelegate, Firebase){
+	.controller('ModuleController', function($scope, ModuleService, $ionicModal, $http, User, ChatService, $state, $ionicScrollDelegate, $ionicPopup, Firebase, GroupService, IonicClosePopupService){
 
 		$scope.$on('$ionicView.enter', function (e) {
 			$scope.refresh();
@@ -192,37 +225,56 @@ angular.module('NUSTalk.controllers',['firebase'])
 			}).then(function (modal) {
 				$scope.newChatModal = modal;
 			});
+			$ionicModal.fromTemplateUrl('templates/modal-newGroupChat.html', {
+				scope: $scope,
+				animation: 'slide-in-up'
+			}).then(function (modal) {
+				$scope.newGroupChatModal = modal;
+			});
+			$ionicModal.fromTemplateUrl('templates/modal-setGroupName.html', {
+				scope: $scope,
+				animation: 'slide-in-right'
+			}).then(function (modal) {
+				$scope.setGroupModal = modal;
+			});
 
 			$scope.chats = []; 
 
-			var UserRef = firebase.database().ref('Users/users/'+ User.getUserName() +'/' + ModuleService.getCurrentModule().CourseCode + '/Chats');
+			var ChatsRef = firebase.database().ref('users/' + User.getUserId() + '/threads').orderByChild('lastTextTime');
 			
-			UserRef.on('child_added', function(data) {
-				console.log('chat started with '+ data.val().Name);
-				var messagesRef = firebase.database().ref('Users/users/'+ User.getUserName() +'/' + ModuleService.getCurrentModule().CourseCode + '/Chats/'+ data.val().Name);
-
-				messagesRef.limitToLast(2).on("child_added", function (snapshot) {
-	        		if(snapshot.key != "Name"){
-	        			$scope.last = snapshot.val().message;
-	        			console.log($scope.last);
-	        		}	
-	        	});
-	        		
+			ChatsRef.on('child_added', function(data) {
+				console.log('chat: '+ data.key);
 				$scope.chats.unshift(
-					{Name: data.val().Name,
-					lastText: $scope.last}
+					{ 'Name': data.val().Name,
+					  'UserID': data.val().UserID || "",	
+					  'lastText': data.val().lastText.message || "Send a message...",
+					  'threadID': data.key,
+					  'type': data.val().type }
 					//face: './img/default-user.png'}
 				);	
 			});
 
 			//go from module page
 			$scope.goToChat = function(other){
+				ChatService.setCurrentThread(other.threadID);
+				if(other.type == 2){
+					GroupService.setName(other.Name);
+					console.log(GroupService.getName());
+					$state.go('NUSTalk.groupChatDetails');
+				}
+				else{
 			 		ChatService.setOtherUser(other);
 			 		$state.go('NUSTalk.chatDetails');
-			 };
+			 	}
+			};
 
+
+			$scope.contacts = [];
+			
 			$scope.newChat = function(){
-				console.log('new chat');
+
+				ChatService.setCurrentThread("");
+
 				$http.get('https://ivle.nus.edu.sg/api/Lapi.svc/Module_Lecturers?APIKey=JWE5l4plZpPkhqENrgaVx&AuthToken='+User.getToken()+'&CourseID='+$scope.currentModule.ID+'&Duration=0', { cache: false })
 				.then(function(result){
 					$scope.moduleFacils = JSON.parse(JSON.stringify(result.data.Results));
@@ -238,6 +290,8 @@ angular.module('NUSTalk.controllers',['firebase'])
 							$scope.tutors.list.push($scope.moduleFacils[i]);
 					};
 
+					$scope.contacts = $scope.contacts.concat($scope.lecturers.list.concat($scope.tutors.list));
+
 				});
 
 				$http.get('https://ivle.nus.edu.sg/API/Lapi.svc/Class_Roster?APIKey=JWE5l4plZpPkhqENrgaVx&AuthToken='+User.getToken()+'&CourseID='+$scope.currentModule.ID, { cache: false })
@@ -248,7 +302,11 @@ angular.module('NUSTalk.controllers',['firebase'])
 							show: false,
 							list: result.data.Results
 						}
-					});
+						$scope.contacts = $scope.contacts.concat($scope.classRoster.list);
+				});
+
+
+
 
 				/*	
 				$http.get('https://ivle.nus.edu.sg/API/Lapi.svc/GroupsByUserAndModule?APIKey=JWE5l4plZpPkhqENrgaVx&AuthToken='+User.getToken()+'&CourseID='+$scope.currentModule.ID+'&AcadYear=2016/2017&Semester=2', { cache: false })
@@ -263,30 +321,158 @@ angular.module('NUSTalk.controllers',['firebase'])
 							list: result2.data.Results
 						}
 					});
+					$scope.contacts = $scope.contacts.concat($scope.classRoster.list);
 				});	
 				*/
+				var myPopup = $ionicPopup.show({
+					templateUrl: 'templates/popup-chooseChat.html',
+					title: 'Choose Chat Type',
+					scope: $scope
+				});
 
-				$scope.newChatModal.show();
+				IonicClosePopupService.register(myPopup);
 
-				$scope.toggleQuery = function(query) {
-			    	query.show = !query.show;
-			 	};
-				$scope.isQueryShown = function(query) {
-			    	return query.show;
-			 	};
+				$scope.chatType = function(choice){
+					if(choice === 'p'){
+						console.log('new private chat');
+						myPopup.close();
+						$scope.searchItem = "";
+						$scope.newChatModal.show().then(function(){
+							$scope.toggleQuery = function(query) {
+						    	query.show = !query.show;
+						 	};
+							$scope.isQueryShown = function(query) {
+						    	return query.show;
+						 	};
+						});
+					}
+					else{
+						console.log('new group chat');
+						myPopup.close();	
+						$scope.searchItem = "";
+						$scope.members = [];
+						$scope.showMembers = "";
+						$scope.group = {};
+						$scope.newGroupChatModal.show().then(function(){
+							$scope.toggleQuery = function(query) {
+						    	query.show = !query.show;
+						 	};
+							$scope.isQueryShown = function(query) {
+						    	return query.show;
+						 	};
+						 	$scope.toggleSelection = function(data){
+						 		if ($scope.members.indexOf(data) == -1) {
+						 			$scope.members.push(data);
+						 			if($scope.showMembers != "")
+						 				$scope.showMembers +=  ', ' + (data.Name || data.User.Name); 
+						 			else
+						 				$scope.showMembers += data.Name || data.User.Name;	
+						 		}
+						 		else {
+						 			var index = $scope.members.indexOf(data);
+						 			if(index == 0 && $scope.members.length>1 )
+						 				$scope.showMembers = $scope.showMembers.replace((data.Name || data.User.Name)+", ", "");
+						 			else if($scope.members.length == 1)
+						 				$scope.showMembers = $scope.showMembers.replace((data.Name || data.User.Name), "");
+						 			else
+						 				$scope.showMembers = $scope.showMembers.replace(", " + (data.Name || data.User.Name), "");
+						 			$scope.members.splice(index, 1);
+						 		}
+						 		console.log($scope.showMembers);
+						 	}
+						 	$scope.next = function(){
+						 		GroupService.setMembers($scope.members);
+						 		console.log('members', GroupService.getMembers());
+						 		$scope.newGroupChatModal.hide();
+						 		$scope.setGroupModal.show();	
+						 	}
+						 	$scope.done = function(){
+						 		var mem=[];
+						 		for(var i=0;i<$scope.members.length;++i)
+						 			mem.push($scope.members[i].UserID || $scope.members[i].User.UserID);	
+						 		mem.push(User.getUserId());
+						 		GroupService.setName($scope.group.groupName);
+						 		GroupService.setMembers(mem);
+						 		$scope.setGroupModal.hide();		
+						 		$state.go('NUSTalk.groupChatDetails');	
+						 	}
+						 	$scope.tutorialGroupChat = function(){
+						 		
+						 	}
+						});
+					}
+				}
+			
+				$scope.closeSetGroupModal = function(){
+		     		$scope.setGroupModal.hide();
+		    	}
 
 			 	$scope.goToChat = function(other){
 			 		ChatService.setOtherUser(other);
 			 		$scope.newChatModal.hide();
 			 		$state.go('NUSTalk.chatDetails');
 			 	};
-			}
 
-		    $scope.closeNewChatModal = function(){
-		     	$scope.newChatModal.hide();
-		    }
-		    $scope.$broadcast('scroll.refreshComplete');
-		}
+			 	$scope.groupChat = function(group){
+			 		if(group == null){
+			 			console.log('Tutorial Group Chat');
+			 		}
+			 		$scope.newChatModal.hide();
+			 		$state.go('NUSTalk.groupChatDetails');
+			 	};
+
+			 	$scope.closeNewChatModal = function(){
+			     	$scope.newChatModal.hide();
+			    }
+
+				$scope.closeNewGroupChatModal = function(){
+			     	$scope.newGroupChatModal.hide();
+			    }
+
+			    $scope.showSearch = false;
+		     	$scope.searched = false;
+			  	
+			  	$scope.search = function(){
+			   	 	console.log('search');
+			   	 	$scope.searchItem = "";
+			   	 	$scope.searched = false;
+			   	 	$scope.showSearch = !$scope.showSearch;
+			   	 }
+
+			   	$scope.find = function(data){
+			  		console.log(data);
+			  		data = data.toLowerCase();
+			  		$scope.searched = true;	
+			  		$scope.searchedContacts = [];
+
+			  		for(var i=0 ; i < $scope.contacts.length; ++i){
+			  			var contact = $scope.contacts[i];
+			  			if((contact.Name != null && contact.Name.toLowerCase().indexOf(data)!=-1) || (contact.User != null && contact.User.Name.toLowerCase().indexOf(data)!=-1)){
+			  				console.log(contact);
+			  				$scope.searchedContacts.push(contact);
+			  			}
+			  		}
+			  		console.log($scope.searchedContacts);
+			  	}
+			};
+
+		    $scope.searchChat = "";
+
+		   	$scope.findChat = function(data){
+		  		console.log(data);
+		  		data = data.toLowerCase();	
+		  		$scope.searchedChats = [];
+
+		  		for(var i=0 ; i < $scope.chats.length; ++i){
+		  			var chat = $scope.chats[i];
+		  			console.log(chat.Name + " " + data);
+		  			if(chat.Name.toLowerCase().indexOf(data)!=-1)
+		  				$scope.searchedChats.push(chat);
+		  		}
+		  		console.log($scope.searchedChats);
+		  	}
+		  	$scope.$broadcast('scroll.refreshComplete');
+		 };
 	})
 
 	.controller('ChatDetailsController', function($scope, $state, ChatService, Firebase, User, $ionicScrollDelegate, $timeout, $rootScope, ModuleService, $cordovaImagePicker){
@@ -298,65 +484,63 @@ angular.module('NUSTalk.controllers',['firebase'])
   		});
 
 		$scope.otherUser = ChatService.getOtherUser(); 
+
+		$scope.currentThread = ChatService.getCurrentThread();
 		
+		$scope.threadsRef = firebase.database().ref('threads/' + ModuleService.getCurrentModule().CourseCode);
+		$scope.userRef = firebase.database().ref('users/' + User.getUserId());
+
+		if($scope.currentThread == ""){
+			console.log('New chat');
+			$scope.threadsRef.push({
+				'name': "",
+				'members':[
+					User.getUserId(),
+					ChatService.getOtherUser().UserID || ChatService.getOtherUser().User.UserID]	
+			})
+			$scope.threadsRef.limitToLast(1).on("child_added", function(childSnapshot){
+			console.log(childSnapshot.key);
+			$scope.currentThread = childSnapshot.key;
+			$scope.userRef.child('threads').child($scope.currentThread).set({
+				'Name': ChatService.getOtherUser().Name || ChatService.getOtherUser().User.Name,
+				'UserID': ChatService.getOtherUser().UserID || ChatService.getOtherUser().User.UserID,
+				'lastText': "",
+				'lastTextTime': new Date().getTime(),
+				'type': 1
+				});
+			});
+		}
+
+		$scope.messages = [];
+
+		$scope.messagesRef = firebase.database().ref('threads/' + ModuleService.getCurrentModule().CourseCode + '/' + $scope.currentThread + '/messages');
+			
+			$scope.messagesRef.on('child_added', function(data) {
+				console.log('new message'+ data.val().message);
+				$scope.messages.push(data.val());	
+				$timeout(function() {
+	    			$ionicScrollDelegate.scrollBottom();
+		  		});
+			});
+		
+
 		$scope.sendMessage = function(msg){
 
 			//$ionicScrollDelegate.scrollBottom(true);
-
 			var data = {
-				sender: User.getUserName(),
+				sender: User.getUserId(),
 				message: msg,
 				time: new Date().getTime()
 			};
 
-			console.log(data.time);
-			var UserRef = firebase.database().ref('Users');
-
-			if(ChatService.getOtherUser().Name != 'NUSBot'){
-
-				UserRef.child('users').child(ChatService.getOtherUser().Name).child(ModuleService.getCurrentModule().CourseCode).child('Chats').child(User.getUserName()).child('Name').set(User.getUserName());
-				UserRef.child('users').child(ChatService.getOtherUser().Name).child(ModuleService.getCurrentModule().CourseCode).child('Chats').child(User.getUserName()).push(data);
-
-				UserRef.child('users').child(User.getUserName()).child(ModuleService.getCurrentModule().CourseCode).child('Chats').child(ChatService.getOtherUser().Name).child('Name').set(ChatService.getOtherUser().Name);
-				UserRef.child('users').child(User.getUserName()).child(ModuleService.getCurrentModule().CourseCode).child('Chats').child(ChatService.getOtherUser().Name).push(data);
-			}
-			else{
-				UserRef.child('users').child('BOT').child(User.getUserName()).push(data);
-				UserRef.child('users').child(User.getUserName()).child('NUSBot').push(data);
-			}	
+			console.log(data);			
+			console.log($scope.currentThread);
+			$scope.threadsRef.child($scope.currentThread).child('messages').push(data);
+			$scope.userRef.child('threads').child($scope.currentThread).child('lastText').set(data);
+			$scope.userRef.child('threads').child($scope.currentThread).child('lastTextTime').set(data.time);				
 			$scope.inputMessage = {};
+		};
 
-		}	
-
-
-		$scope.messages = [];
-
-		if(ChatService.getOtherUser().Name != 'NUSBot'){
-			var messagesRef = firebase.database().ref('Users/users/'+ User.getUserName() +'/' + ModuleService.getCurrentModule().CourseCode + '/Chats/'+ ChatService.getOtherUser().Name);
-			
-			messagesRef.on('child_added', function(data) {
-				console.log('new message'+ data.val().message);
-				if(data.key != 'Name'){
-					$scope.messages.push(data.val());	
-					$timeout(function() {
-	    			$ionicScrollDelegate.scrollBottom();
-		  			});
-				}
-			});
-		}
-		else{
-			var messagesRef = firebase.database().ref('Users/users/'+ User.getUserName() +'/NUSBot');
-			
-			messagesRef.on('child_added', function(data) {
-				console.log('new message'+ data.val().message);
-				if(data.key != 'Name'){
-					$scope.messages.push(data.val());	
-					$timeout(function(){
-	    				$ionicScrollDelegate.scrollBottom();
-		  			});
-				}
-			});
-		}
 
 		$scope.sendImages = function(){
 			 
@@ -377,5 +561,90 @@ angular.module('NUSTalk.controllers',['firebase'])
 			    });
 			};
 
-	});
+	})
+	
+	.controller('GroupChatDetailsController', function($scope, $state, ChatService, Firebase, User, $ionicScrollDelegate, $timeout, $rootScope, ModuleService, $cordovaImagePicker, GroupService){
+
+		$scope.inputMessage = {};
+		$scope.group = GroupService.getGroup();
+		$scope.user = User.getUserId();
+
+		$timeout(function() {
+    		$ionicScrollDelegate.scrollBottom();
+  		});
+
+		$scope.currentThread = ChatService.getCurrentThread();
+		
+		$scope.threadsRef = firebase.database().ref('threads/' + ModuleService.getCurrentModule().CourseCode);
+		$scope.userRef = firebase.database().ref('users/' + User.getUserId());
+
+		if($scope.currentThread == ""){
+			console.log('New chat');
+			$scope.threadsRef.push({
+				'name': $scope.group.name,
+				'members': $scope.group.members
+			})
+			$scope.threadsRef.limitToLast(1).on("child_added", function(childSnapshot){
+				console.log(childSnapshot.key);
+				$scope.currentThread = childSnapshot.key;
+				$scope.userRef.child('threads').child($scope.currentThread).set({
+					'Name': $scope.group.name,
+					'lastText': "",
+					'lastTextTime': new Date().getTime(),
+					'type': 2
+				});
+			});
+		}
+
+		console.log($scope.group.name, $scope.group.members);
+		$scope.messages = [];
+
+			$scope.messagesRef = firebase.database().ref('threads/' + ModuleService.getCurrentModule().CourseCode + '/' + $scope.currentThread + '/messages');
+			
+			$scope.messagesRef.on('child_added', function(data) {
+				console.log('new message'+ data.val().message);
+				$scope.messages.push(data.val());	
+				$timeout(function() {
+	    			$ionicScrollDelegate.scrollBottom();
+		  		});
+			});
+		
+
+			$scope.sendMessage = function(msg){
+
+				//$ionicScrollDelegate.scrollBottom(true);
+				var data = {
+					sender: User.getUserId(),
+					message: msg,
+					time: new Date().getTime()
+				};
+
+				console.log(data);			
+				console.log($scope.currentThread);
+				$scope.threadsRef.child($scope.currentThread).child('messages').push(data);
+				$scope.userRef.child('threads').child($scope.currentThread).child('lastText').set(data);				
+				$scope.inputMessage = {};
+			};
+
+		$scope.sendImages = function(){
+			 
+			 //var storageRef = firebase.storage().ref();
+			 //var imgRef = storageRef.child('images');
+			 var options = {
+			   maximumImagesCount: 1,
+			   width: 800,
+			   height: 800,
+			   quality: 80
+			  };
+
+			  $cordovaImagePicker.getPictures(options)
+			    .then(function (result) {
+			    	;
+			    }, function(error) {
+			      // error getting photos
+			    });
+			};
+
+	})
+	
 	

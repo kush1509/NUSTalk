@@ -1,0 +1,64 @@
+<ion-modal-view>
+	
+	<ion-header-bar class="bar bar-header bar-positive">
+	<button class="button button-clear button-primary" ng-click="closeNewGroupChatModal()">Cancel</button>
+	  <h1 class="title" style="text-align: center;">Add Members</h1>
+	 <button class="button button-clear button-small pull-right" ng-click="next()">Next</button> 
+	</ion-header-bar>
+
+	<div class="bar bar-stable bar-subheader item-input-inset">
+	    <label class="item-input-wrapper">
+	      <i class="icon ion-ios-search placeholder-icon"></i>
+	      <input type="search" placeholder="Search" ng-model="searchItem">
+	    </label>
+        <button class="button button-clear" ng-click="find(searchItem)" ng-show="!(!searchItem || searchItem === '')">
+          Search
+        </button>
+ 	</div>
+
+	<ion-content class="scroll-content ionic-scroll has-subheader">
+	  	<div ng-if="members.length>0">
+	  		{{showMembers}}
+		</div>
+	   	<ion-list ng-if=' searchItem == "" '>
+
+	       	<ion-item ng-click="toggleQuery(lecturers)"
+	            ng-class="{active: isQueryShown(lecturers)}">
+				<i class="icon" ng-class="isQueryShown(lecturers) ? 'ion-chevron-down' : 'ion-chevron-right'"></i>
+					Lecturers
+			</ion-item>		
+	           <ion-list class="lecturer-list" class="item-accordion" ng-show="isQueryShown(lecturers)" item-text-wrap>
+			        <ion-checkbox ng-click="toggleSelection(lecturer)" ng-repeat="lecturer in lecturers.list track by $index">{{lecturer.User.Name}}</ion-checkbox>
+		      </ion-list>
+		      <ion-item ng-click="toggleQuery(tutors)"
+	            ng-class="{active: isQueryShown(tutors)}">
+				<i class="icon" ng-class="isQueryShown(tutors) ? 'ion-chevron-down' : 'ion-chevron-right'"></i>
+					Tutors and Teaching Assistants
+			</ion-item>		
+	           <ion-list class="tutor list" class="item-accordion" ng-show="isQueryShown(tutors)" item-text-wrap>
+			        <ion-checkbox ng-click="toggleSelection(tutor)" ng-repeat="tutor in tutors.list track by $index">
+			        {{tutor.User.Name}}
+			        </ion-checkbox> 
+		      </ion-list>
+		     <ion-item ng-click="toggleQuery(classRoster)"
+	            ng-class="{active: isQueryShown(classRoster)}" class="item-button-right">
+				<i class="icon" ng-class="isQueryShown(classRoster) ? 'ion-chevron-down' : 'ion-chevron-right'"></i>
+					Tutorial Group
+				<button class="button button-positive" ng-click="tutorialGroupChat()">Full Group Chat</button>
+			</ion-item>		
+	           <ion-list class="class list" class="item-accordion" ng-show="isQueryShown(classRoster)" item-text-wrap>
+			        <ion-checkbox ng-click="toggleSelection(peer)" ng-repeat="peer in classRoster.list track by $index" > <!--ng-show="peer.Name!==userName">-->
+			        {{peer.Name}}
+			        </ion-checkbox>
+		      </ion-list>
+
+		 </ion-list>   
+
+		  <ion-list class="item-text-wrap" ng-if='searchItem != "" && searched == true'>
+			    <ion-checkbox ng-click="toggleSelection(contact)" ng-repeat="contact in searchedContacts track by $index">
+			        {{contact.Name}}
+			    </ion-checkbox>			       
+		    </ion-list>  
+
+	</ion-content>
+	</ion-modal-view>

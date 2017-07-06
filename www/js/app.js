@@ -3,7 +3,7 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'ngCordova'])
+angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'ngCordova','ionic.closePopup'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -78,6 +78,16 @@ angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'n
           'NUSTalkSideMenu': {
             templateUrl: 'templates/chatDetails.html',
             controller: 'ChatDetailsController'
+          }
+        }
+      })
+
+      .state('NUSTalk.groupChatDetails', {
+        url: '/module/GroupChat',
+        views: {
+          'NUSTalkSideMenu': {
+            templateUrl: 'templates/groupChatDetails.html',
+            controller: 'GroupChatDetailsController'
           }
         }
       });

@@ -10,15 +10,39 @@
   </ion-nav-buttons>
 </ion-nav-bar>
 
-  <ion-content class="has-header">
+  <div class="bar bar-stable bar-subheader item-input-inset">
+    <label class="item-input-wrapper">
+      <i class="icon ion-ios-search placeholder-icon"></i>
+      <input type="search" placeholder="Search" ng-model="searchChat">
+    </label>
+        <button class="button button-clear" ng-click="findChat(searchChat)" ng-show="!(!searchChat || searchChat === '')">
+          Search
+        </button>
+  </div>
+
+  <ion-content class="has-header has-subheader">
   <ion-refresher on-refresh="refresh()">
     </ion-refresher>
-     <ion-list class="chats-list">
+     <ion-list class="chats-list" ng-if='searchChat == ""'>
       <ion-item class="item item-avatar-left" ng-repeat="chat in chats" ng-click ='goToChat(chat)'>
         <img src="./img/default-user.png">
         <h2>{{ chat.Name }}</h2>
         <p>{{ chat.lastText }}</p>
+        <span class="badge badge-positive"></span>
+        <ion-option-button class="button-positive">Delete</ion-option-button>
+      </ion-item>
+    </ion-list>
+
+    <ion-list class="chats-list" ng-if='searchChat != ""'>
+      <ion-item class="item item-avatar-left" ng-repeat="chat in searchedChats" ng-click ='goToChat(chat)'>
+        <img src="./img/default-user.png">
+        <h2>{{ chat.Name }}</h2>
+        <p>{{ chat.lastText }}</p>
+        <span class="badge badge-positive"></span>
+        <ion-option-button class="button-positive">Delete</ion-option-button>
       </ion-item>
     </ion-list>
   </ion-content>
+
+
 </ion-view>

@@ -51,9 +51,18 @@ angular.module('NUSTalk.services',['firebase'])
 
 	.service('ModuleService', function(){
 
+		var modules = [];
 		var studentModules = [];
 		var staffModules = [];
 		var currentModule = {};
+
+		var setModules = function(data) {
+		    modules = data;
+		};
+
+		var getModules = function(){
+		    return modules;
+ 	    };
 
 		var setStudentModules = function(data) {
 		    studentModules = data;
@@ -79,6 +88,8 @@ angular.module('NUSTalk.services',['firebase'])
  	    	return currentModule;
  	    };
 		  return {
+		    setModules: setModules,
+		    getModules: getModules,
 		    setStudentModules: setStudentModules,
 		    getStudentModules: getStudentModules,
 		    setStaffModules: setStaffModules,
@@ -91,6 +102,7 @@ angular.module('NUSTalk.services',['firebase'])
 	.service('ChatService', function(){
 
 		var otherUser = {};
+		var currentThread = "";
 
 		var setOtherUser = function(data){
 			otherUser = data;
@@ -100,9 +112,18 @@ angular.module('NUSTalk.services',['firebase'])
 		    return otherUser;
  	    };
 
+ 	    var setCurrentThread = function(data){
+			currentThread = data;
+		}
+
+		var getCurrentThread = function(){
+		    return currentThread;
+ 	    };
  	    return {
  	    	setOtherUser: setOtherUser,
- 	    	getOtherUser: getOtherUser
+ 	    	getOtherUser: getOtherUser,
+ 	    	setCurrentThread: setCurrentThread,
+ 	    	getCurrentThread: getCurrentThread
  	    };
 	})
 
@@ -122,4 +143,38 @@ angular.module('NUSTalk.services',['firebase'])
 			addChat: addChat,
 			getChats: getChats
 		}
-	});
+	})
+
+	.service('GroupService', function(){
+
+		var group = {};
+
+		var setName = function(data){
+			group.name = data;
+		};
+
+		var setMembers =  function(data){
+			group.members = data;
+		}
+
+		var getName = function(){
+			return group.name;
+		}
+
+		var getMembers = function(){
+			return group.members;
+		}
+
+		var getGroup = function(){
+			return group;
+		}
+
+		return{
+			setName: setName,
+			getName: getName,
+			setMembers: setMembers,
+			getMembers: getMembers,
+			getGroup: getGroup
+		}
+
+	})

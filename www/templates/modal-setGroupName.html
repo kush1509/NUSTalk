@@ -1,0 +1,22 @@
+<ion-modal-view>
+	
+	<ion-header-bar class="bar bar-header bar-positive">
+	<button class="button button-clear button-primary" ng-click="closeSetGroupModal()">Cancel</button>
+	  <h1 class="title" style="text-align: center;">New Group</h1>
+	 <button class="button button-clear button-small pull-right" ng-click="done()">Done</button> 
+	</ion-header-bar>
+
+	<ion-content class="scroll-content ionic-scroll has-header">
+
+		<label class="item item-avatar item-input">
+			<input style="text-align:center" type="text" placeholder="Group Name" ng-model="group.groupName">
+		 </label>	
+	   	<ion-list>		
+			  <ion-item class="item item-text-wrap item-button-right" ng-repeat="member in members track by $index">{{member.User.Name || member.Name}}
+				  <button class="button" ng-click="toggleSelection(member)">
+				  	<i class="ion-ios-close-empty"></i>
+				  </button>
+			  </ion-item>
+		</ion-list>		    
+	</ion-content>
+</ion-modal-view>
