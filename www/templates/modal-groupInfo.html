@@ -1,0 +1,44 @@
+<ion-modal-view>
+    <ion-header-bar align-title="center" class="bar-positive">
+        <div class="buttons">
+            <button class="button" ng-click="closeGroupInfo()" style="background: transparent; border: 0"><i class="ion-android-arrow-back" style="color: aliceblue!important; font-size: 30px"></i></button>
+        </div>
+        <h1 class="title">Group Info</h1>
+    </ion-header-bar>
+
+    <div class="bar bar-stable bar-subheader">
+      <div ng-if="!edit">
+        <h2 class="title">{{group.name}}</h2>
+        <button class="button button-clear button-small button-icon ion-edit pull-right"  ng-click="editt()"></button>
+      </div>
+      <div ng-if="edit" class="item-input-inset">
+        <label class="item-input-wrapper">
+          <input type="search" ng-model="newName" ng-value="group.name">
+        </label>
+        <button class="button button-clear" ng-click="setName(newName)">
+          Save
+        </button>
+        <button class="button button-clear" ng-click="editt()">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <ion-content class="has-subheader">
+        <div class="card bar-home" style="width: 100%!important; padding: 0!important; margin: 0!important;background-color: transparent; border-radius: 0!important;">
+            <div class="item item-body" style="text-align: center!important; background-color: aliceblue!important">
+               <button class="button button-small ion-edit pull-right" style="position:absolute; top:0; right:0;"  ng-click="changePicture()"></button>  
+              <img style="margin-top:0; height="200px" width="150px"" class="item-thumbnail" src="{{imageUrl}}" ng-click="imageShow(imageUrl)"></img>
+            </div>
+        </div>
+        <h4 style="text-align:center;">Members</h4>
+        <ion-item class="item item-text-wrap item-button-right" ng-click="addMember()">
+        <i class="ion-ios-plus-outline"></i>
+          <strong>Add a member</strong>
+            </ion-item>
+        <ion-list>    
+            <ion-item class="item item-text-wrap item-button-right" ng-repeat="member in members track by $index" ng-click="otherProfile(member)">{{member.UserName}}
+            </ion-item>
+        </ion-list>
+	  <ion-content>	
+</ion-modal-view>    

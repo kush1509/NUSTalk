@@ -37,7 +37,23 @@ angular.module('NUSTalk.services',['firebase'])
 
 		  var getUserId = function(){
 		      return userData.userId;
-		  };			  
+		  };		
+
+		  var setIcon = function(data) {
+		      userData.icon = data;
+		  };
+
+		  var getIcon = function(){
+		      return userData.icon;
+		  };		  	  
+
+		  var setEmail = function(data) {
+		      userData.email = data;
+		  };
+
+		  var getEmail = function(){
+		      return userData.email;
+		  };
 
 		  return {
 		    setToken: setToken,
@@ -45,7 +61,11 @@ angular.module('NUSTalk.services',['firebase'])
 		    setUserName: setUserName,
 		    getUserName: getUserName,
 		    setUserId: setUserId,
-		    getUserId: getUserId
+		    getUserId: getUserId,
+		    setIcon: setIcon,
+		    getIcon: getIcon,
+		    setEmail: setEmail,
+		    getEmail: getEmail
 		  };
 	})
 
@@ -103,6 +123,7 @@ angular.module('NUSTalk.services',['firebase'])
 
 		var otherUser = {};
 		var currentThread = "";
+		var tutorialExists = false;
 
 		var setOtherUser = function(data){
 			otherUser = data;
@@ -119,6 +140,15 @@ angular.module('NUSTalk.services',['firebase'])
 		var getCurrentThread = function(){
 		    return currentThread;
  	    };
+
+ 	    var setTutorial = function(data){
+ 	    	tutorialExists = data;
+ 	    }
+
+ 	    var tutorial = function(){
+ 	    	return tutorialExists;
+ 	    };
+
  	    return {
  	    	setOtherUser: setOtherUser,
  	    	getOtherUser: getOtherUser,
@@ -157,12 +187,20 @@ angular.module('NUSTalk.services',['firebase'])
 			group.members = data;
 		}
 
+		var setIcon =  function(data){
+			group.icon = data;
+		}
+
 		var getName = function(){
 			return group.name;
 		}
 
 		var getMembers = function(){
 			return group.members;
+		}
+
+		var getIcon = function(){
+			return group.icon;
 		}
 
 		var getGroup = function(){
@@ -174,6 +212,8 @@ angular.module('NUSTalk.services',['firebase'])
 			getName: getName,
 			setMembers: setMembers,
 			getMembers: getMembers,
+			setIcon: setIcon,
+			getIcon: getIcon,
 			getGroup: getGroup
 		}
 

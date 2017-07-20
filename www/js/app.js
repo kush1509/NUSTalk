@@ -3,7 +3,7 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'ngCordova','ionic.closePopup'])
+angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'ngCordova','ionic.closePopup','ionic.cloud'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -23,7 +23,27 @@ angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'n
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, $ionicCloudProvider) {
+
+  $ionicConfigProvider.navBar.alignTitle('center');
+
+  $ionicCloudProvider.init({
+      "core": {
+        "app_id": "6731a905"
+      },
+      "push": {
+        "sender_id": "1001751122819",
+        "pluginConfig": {
+          "ios": {
+            "badge": true,
+            "sound": true
+          },
+          "android": {
+            "iconColor": "#343434"
+          }
+        }
+      }
+    });
 
   $stateProvider
       
@@ -41,7 +61,12 @@ angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'n
         controller: 'LoggedInCtrl'
       })
 
-
+      .state('profile', {
+        url: '/Profile',
+        templateUrl: 'templates/profile.html',
+        controller: 'ProfileCtrl'
+      })
+      
       .state('NUSTalk', {
         url: '/NUSTalk',
         abstract: true,
@@ -90,7 +115,7 @@ angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'n
             controller: 'GroupChatDetailsController'
           }
         }
-      });
+      });   
 
     $urlRouterProvider.otherwise('/login');
   });

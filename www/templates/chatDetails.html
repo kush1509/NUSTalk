@@ -1,22 +1,35 @@
-<ion-view view-title="{{otherUser.Name || otherUser.User.Name}}">
+b<ion-view view-title="{{otherUser.Name || otherUser.User.Name}}">
 	
 	<ion-nav-bar class="bar-positive">
   <ion-nav-back-button class="button-clear">
     <i class="ion-chevron-left"></i> Chats
   </ion-nav-back-button>
+
+  <ion-nav-buttons side="right">
+	   <button ng-click="otherProfile()" class="button button-icon button-small ion-information-circled"></button>
+	  </ion-nav-buttons>
+
+  	</ion-nav-bar>
   
 	<ion-content class="content-stable"
                  on-swipe-left="hideTime = false"
                  on-swipe-right="hideTime = true" id='messages'
                  >
 
-        
+    
 		<div ng-repeat="message in messages"
            ng-class="{other: (message.sender == otherUser.UserID)}"
            class="messages">
 		   
 		   	<div class="message">
-				<span class="msg">{{ message.message }}</span>
+				<span class="msg" ng-if="message.message">
+					{{ message.message }} &nbsp
+					<sub style="font-size:10px; color:black; opacity: 0.2; margin-right:0;"> {{ message.time }} </sub>
+				</span>
+				<span  class="msg" ng-if="!message.message" >
+					<img src="{{message.imageUrl}}" ng-click="imageShow(message.imageUrl)" style="height: 250px; width:200px"></img>
+					<p style="font-size:10px; color:black; opacity: 0.3; margin-right:0;"> {{ message.time }} </p>
+				</span>	
 			</div>
 
 			<!--

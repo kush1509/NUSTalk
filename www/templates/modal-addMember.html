@@ -1,9 +1,8 @@
 <ion-modal-view>
 	
 	<ion-header-bar class="bar bar-header bar-positive">
-	<button class="button button-clear button-primary" ng-click="closeNewGroupChatModal()">Cancel</button>
+	<button class="button button-clear button-primary" ng-click="closeAddMemberModal()">Cancel</button>
 	  <h1 class="title" style="text-align: center;">Add Members</h1>
-	 <button class="button button-clear button-small pull-right" ng-click="next()">Next</button> 
 	</ion-header-bar>
 
 	<div class="bar bar-stable bar-subheader item-input-inset">
@@ -14,9 +13,6 @@
  	</div>
 
 	<ion-content class="scroll-content ionic-scroll has-subheader">
-	  	<div ng-if="members.length>0">
-	  		{{showMembers}}
-		</div>
 	   	<ion-list ng-if="!searchItem.item || searchItem.item == '' ">
 
 	       	<ion-item ng-click="toggleQuery(lecturers)"
@@ -25,7 +21,9 @@
 					Lecturers
 			</ion-item>		
 	           <ion-list class="lecturer-list" class="item-accordion" ng-show="isQueryShown(lecturers)" item-text-wrap>
-			        <ion-checkbox ng-click="toggleSelection(lecturer)" ng-repeat="lecturer in lecturers.list track by $index">{{lecturer.User.Name}}</ion-checkbox>
+			        <ion-item ng-click="addToChat(lecturer)" ng-repeat="lecturer in lecturers.list track by $index">
+			        {{lecturer.User.Name}}
+			        </ion-item>
 		      </ion-list>
 		      <ion-item ng-click="toggleQuery(tutors)"
 	            ng-class="{active: isQueryShown(tutors)}">
@@ -33,38 +31,38 @@
 					Tutors and Teaching Assistants
 			</ion-item>		
 	           <ion-list class="tutor list" class="item-accordion" ng-show="isQueryShown(tutors)" item-text-wrap>
-			        <ion-checkbox ng-click="toggleSelection(tutor)" ng-repeat="tutor in tutors.list track by $index">
+			        <ion-item ng-click="addToChat(tutor)" ng-repeat="tutor in tutors.list track by $index" >
 			        {{tutor.User.Name}}
-			        </ion-checkbox> 
+			        </ion-item>
+			       
 		      </ion-list>
 		     <ion-item ng-click="toggleQuery(tutorial)"
-	            ng-class="{active: isQueryShown(tutorial)}" class="item-button-right">
+	            ng-class="{active: isQueryShown(tutorial)}" >
 				<i class="icon" ng-class="isQueryShown(tutorial) ? 'ion-chevron-down' : 'ion-chevron-right'"></i>
-					Tutorial Group
-				<button class="button button-positive" ng-click="tutorialGroupChat()"><i class=" icon ion-ios-people"></i></button>
+					Tutorial Group			
 			</ion-item>		
 	           <ion-list class="class list" class="item-accordion" ng-show="isQueryShown(tutorial)" item-text-wrap>
-			        <ion-checkbox ng-click="toggleSelection(peer)" ng-repeat="peer in tutorial.list track by $index" ng-show="peer.Name!==userName">
+			        <ion-item ng-click="addToChat(peer)" ng-repeat="peer in tutorial.list track by $index">
 			        {{peer.Name}}
-			        </ion-checkbox>
+			        </ion-item>
 		      </ion-list>
 		       <ion-item ng-click="toggleQuery(classRoster)"
-	            ng-class="{active: isQueryShown(classRoster)}">
+	            ng-class="{active: isQueryShown(classRoster)}" >
 				<i class="icon" ng-class="isQueryShown(classRoster) ? 'ion-chevron-down' : 'ion-chevron-right'"></i>
-					Class Roster
+					Class Roster			
 			</ion-item>		
 	           <ion-list class="class list" class="item-accordion" ng-show="isQueryShown(classRoster)" item-text-wrap>
-			        <ion-checkbox ng-click="toggleSelection(peer)" ng-repeat="peer in classRoster.list track by $index" ng-show="peer.Name!==userName">
+			        <ion-item ng-click="addToChat(peer)" ng-repeat="peer in classRoster.list track by $index">
 			        {{peer.Name}}
-			        </ion-checkbox>
+			        </ion-item>
 		      </ion-list>
 
 		 </ion-list>   
 
 		  <ion-list class="item-text-wrap" ng-if="!(!searchItem.item || searchItem.item == '')">
-			    <ion-checkbox ng-click="toggleSelection(contact)" ng-repeat="contact in contacts | filter: searchItem.item" ng-show="contact.Name!==userName">
-			        {{contact.Name}}
-			    </ion-checkbox>			       
+			    <ion-item ng-click="addToChat(contact)" ng-repeat="contact in contacts | filter: searchItem.item" >
+			        {{contact.Name || contact.User.Name}}
+			    </ion-item>			       
 		    </ion-list>  
 
 	</ion-content>

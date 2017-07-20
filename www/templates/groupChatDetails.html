@@ -1,9 +1,15 @@
 <ion-view view-title="{{group.name}}">
-	
+
 	<ion-nav-bar class="bar-positive">
-  <ion-nav-back-button class="button-clear">
-    <i class="ion-chevron-left"></i> Chats
-  </ion-nav-back-button>
+	  <ion-nav-back-button class="button-clear">
+	    <i class="ion-chevron-left"></i> Chats
+	  </ion-nav-back-button>
+
+	  <ion-nav-buttons side="right">
+	   <button ng-click="groupInfo()" class="button button-icon button-small ion-information-circled"></button>
+	  </ion-nav-buttons>
+	</ion-nav-bar>
+
   
 	<ion-content class="content-stable"
                  on-swipe-left="hideTime = false"
@@ -12,11 +18,14 @@
 
         
 		<div ng-repeat="message in messages"
-           ng-class="{other: (message.sender !== user)}"
+           ng-class="{other: (message.senderID !== user)}"
            class="messages">
 		   
 		   	<div class="message">
-				<span class="msg">{{ message.message }}</span>
+				<span class="msg" ng-if="message.message"><div style="font-size:12px; color: red" ng-if="message.senderID !== user">{{message.senderName}} <br></div> {{message.message }}&nbsp
+					<sub style="font-size:10px; color:black; opacity: 0.2; margin-right:0;"> {{ message.time }} </sub></span>
+				<span class="msg" ng-if="!message.message"><div style="font-size:12px; color: red" ng-if="message.senderID !== user">{{message.senderName}} <br></div><img src="{{message.imageUrl}}" ng-click="imageShow(message.imageUrl)" style="height: 250px; width:200px"></img>&nbsp
+					<sub style="font-size:10px; color:black; opacity: 0.3; margin-right:0;"> {{ message.time }} </sub></span>
 			</div>
 
 			<!--

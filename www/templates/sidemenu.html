@@ -14,14 +14,14 @@
 
   <ion-side-menu side="left">
     <ion-content>
-     <img class="item-thumbnail img-circle" src="./img/default-user.png"></img>
+     <img class="item-thumbnail img-circle" src="{{DP}}" ng-click="imageShow(imageUrl)"></img>
       <h4 id="sideMenuUser">{{Username}}</h4>
       <h5 id="sideMenuId"> @{{UserId}} </h5>
       <ion-list>
         <ion-item  class="item item-icon-left" menu-close href="#/NUSTalk/home">
           <i class="icon ion-home"></i> Home
         </ion-item>
-        <ion-item  class="item item-icon-left" menu-close href="#/NUSTalk/Profile">
+        <ion-item  class="item item-icon-left" menu-close href="#/Profile">
           <i class="icon ion-person"></i> Profile
         </ion-item>
         <ion-item  class="item item-icon-left" menu-close href="#/NUSTalk/settings">

@@ -1,6 +1,6 @@
 {
   "name": "NUSTalk3",
-  "app_id": "",
+  "app_id": "6731a905",
   "type": "ionic1",
   "watchPatterns": [
     "scss/**/*"

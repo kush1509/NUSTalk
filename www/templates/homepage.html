@@ -13,14 +13,11 @@
     <div class="bar bar-positive bar-header item-input-inset" ng-if="showSearch">
       <label class="item-input-wrapper">
         <i class="icon ion-ios-search placeholder-icon"></i>
-        <input type="search" placeholder="Search Modules" ng-model="searchItem">
+        <input type="search" placeholder="Search Modules" ng-model="searchItem.item">
       </label>
       <div class="button-clear">
-        <button class="button button-clear" ng-click="search()" ng-show="!searchItem || searchItem === ''">
+        <button class="button button-clear" ng-click="search()">
           Cancel
-        </button>
-        <button class="button button-clear" ng-click="find(searchItem)" ng-show="!(!searchItem || searchItem === '')">
-          Search
         </button>
       </div>
     </div>
@@ -28,22 +25,22 @@
   <ion-content class="has-header">
     <!--displays list of modules-->
     <!--TODO: make list editable-->
-    <div ng-if='!searched'>
       <h3 ng-show="!studentModules.length==0" id="HomepageHeading">Enrolled Modules</h3>
         <ion-list class="module-list">
-          <ion-item class='card item-text-wrap' ng-href='#/NUSTalk/module/{{module.CourseCode}}' ng-repeat="module in studentModules track by $index"  ng-click = "setCurrentModule(module)">
+          <ion-item class='card item-text-wrap' ng-href='#/NUSTalk/module/{{module.CourseCode}}' ng-repeat="module in studentModules | filter: searchItem.item "  ng-click = "setCurrentModule(module)">
            {{module.CourseCode}} : {{ module.CourseName}}
           </ion-item>
         </ion-list>
 
         <h3 ng-show="!staffModules.length==0">Teaching Modules</h3>
         <ion-list class="module-list">
-          <ion-item class='card item-text-wrap' ng-href='#/NUSTalk/module/{{module.CourseCode}}' ng-repeat="module in staffModules track by $index"  ng-click = "setCurrentModule(module)" >
+          <ion-item class='card item-text-wrap' ng-href='#/NUSTalk/module/{{module.CourseCode}}' ng-repeat="module in staffModules | filter: searchItem.item "  ng-click = "setCurrentModule(module)" >
            {{module.CourseCode}} : {{ module.CourseName}}
           </ion-item>
         </ion-list>
       </div>
 
+      <!--
       <div ng-if="searched">
         <ion-list>
           <ion-item class='card item-text-wrap' ng-href='#/NUSTalk/module/{{module.CourseCode}}' ng-repeat="module in searchedModules track by $index"  ng-click = "setCurrentModule(module)">
@@ -51,6 +48,7 @@
           </ion-item>
         </ion-list>
       </div>
+    -->
     </ion-content>
       <div class="float-button button card" ng-click="goToChat()">
         <span class="height-fix">

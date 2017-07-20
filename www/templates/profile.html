@@ -1,0 +1,25 @@
+<ion-view view-title='Profile'>
+
+  <div class="bar bar-header bar-positive">
+    <button class="button button-clear" ng-click="goHome()"><i class="ion-chevron-left"></i> Home</button>
+    <h1 class="title">Profile</h1>
+  </div>
+
+  <ion-content class="has-header">
+    <div class="card" style="width: 100%!important; padding: 0!important; margin: 0!important;background-color: transparent; border-radius: 0!important;">
+        <div class="item item-body" style="text-align: center!important; background-color: aliceblue!important">
+          <img style="margin-top:0; height="200px" width="150px" " class="item-thumbnail" src="{{imageUrl}}" ng-click="imageShow(imageUrl)"></img>
+          <button class="button button-small ion-edit pull-right" style="position:absolute; top:0; right:0;"  ng-click="changePicture()"></button>  
+        </div>
+    </div>
+    <div class="card">
+      <h5>Name : {{userName}}</h5>
+    </div>
+    <div class="card">
+      <h5>UserID : {{userID}}</h5>
+    </div>  
+    <div class="card">
+     <h5> Email : {{email}}</h5>
+    </div>  
+  </ion-content>
+</ion-view>
