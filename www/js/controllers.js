@@ -78,9 +78,9 @@ angular.module('NUSTalk.controllers',['firebase'])
 			       	console.log('no');
 			     });
 			    
-			      /*
+			      
 			     
-			    
+			    /*
 		     var win = window.open(link);	
   			
   			var interval = setInterval(function(){
@@ -102,13 +102,22 @@ angular.module('NUSTalk.controllers',['firebase'])
 
 	})
 
-	.controller('LoggedInCtrl', function($scope, $state, $http, User, ModuleService, Firebase, $rootScope, $ionicPush){
+	.controller('LoggedInCtrl', function($scope, $state, $http, User, $ionicLoading ,ModuleService, Firebase, $rootScope, $ionicPush, BotService){
 
+		$ionicLoading.show({
+			template: '<ion-spinner icon="ios-small" class="spinner-calm"></ion-spinner><p>Logging In</p>',
+			animation: 'fade-in',
+			showBackdrop: true,
+			showDelay: 0
+		});
+
+		
 		$ionicPush.register().then(function(t) {
 		  return $ionicPush.saveToken(t);
 		}).then(function(t) {
 			$rootScope.pushToken = t.token;
 		  console.log('Token saved:', t.token);
+		  
 
 			$http.get('https://ivle.nus.edu.sg/api/Lapi.svc/UserName_Get?APIKey=JWE5l4plZpPkhqENrgaVx&Token='+User.getToken(), { cache: true })
 				.then(function(result){
@@ -127,6 +136,7 @@ angular.module('NUSTalk.controllers',['firebase'])
 					console.log(result);
 					
 					var UserRef = firebase.database().ref('users');
+					var threadsRef = firebase.database().ref('threads');
 
 					var flag = 0;
 					UserRef.once('value', function(snapshot) {
@@ -146,9 +156,39 @@ angular.module('NUSTalk.controllers',['firebase'])
 								'email': User.getEmail(),		 							
 	 							'token': $rootScope.pushToken
 	 						});
-					  }
+	 						$http({
+								method: "POST",
+								url: "https://directline.botframework.com/api/conversations",
+								headers: {
+							 	   'Authorization': 'Bearer SfB4DslT2ew.cwA.F64.3AfjhRhOOZsoXoONOYDquiVTSn0NUhDcuxNsYxqmAM8'
+							 	}
+							}).then(function(response){
+								BotService.setToken(response.data.token);
+								BotService.setConID(response.data.conversationId);
+								threadsRef.child('BOT').child(result.data).child('conversationID').set(response.data.conversationId);
+								threadsRef.child('BOT').child(result.data).child('watermark').set(0);
+						   	 	console.log(response);
+						   	 	$http({
+									method: "POST",
+									url: "https://directline.botframework.com/api/conversations/" + BotService.getConID() + "/messages",
+									headers: {
+								 	   'Authorization': 'BotConnector ' + 'SfB4DslT2ew.cwA.F64.3AfjhRhOOZsoXoONOYDquiVTSn0NUhDcuxNsYxqmAM8'
+								 	},
+									data: {
+									    'text': "ivle token is " + User.getToken(),
+									    'from': User.getUserId() 
+									},
+								}).then(function(data){
+									console.log('token sent', data);
+								});
+						   	});
+					  	}
+					  	else{	
+							threadsRef.child('BOT').child(result.data).once('value', function(snapshot){
+								BotService.setConID(snapshot.val().conversationID);	
+							})
+					  	}
 	 				});
-					
 					User.setUserId(result.data);
 					$scope.picRef = firebase.database().ref('users/'+ result.data +'/picture');
 					$scope.picRef.once('value', function(snapshot){
@@ -170,17 +210,19 @@ angular.module('NUSTalk.controllers',['firebase'])
 					ModuleService.setStaffModules(result.data.Results);
 				});
 
+
 			$http.get('https://ivle.nus.edu.sg/api/Lapi.svc/Modules_Student?APIKey=JWE5l4plZpPkhqENrgaVx&AuthToken='+User.getToken()+'&Duration=0&IncludeAllInfo=false', { cache: false })
 				.then(function(result){
 					console.log(result);
 					ModuleService.setStudentModules(result.data.Results);
 					$state.go('NUSTalk.home');
-				});	
-		});
+				});
+		});	
 	}) 
 
-	.controller('HomeController', function($scope, User, $http, ModuleService, $state, ChatService, $ionicModal, $rootScope){
-		
+	.controller('HomeController', function($scope, $ionicLoading, User, $http, ModuleService, $state, ChatService, $ionicModal, $rootScope){
+			
+		 $ionicLoading.hide();	
 	     $scope.showSearch = false;
 	     $scope.searched = false;
 
@@ -205,8 +247,8 @@ angular.module('NUSTalk.controllers',['firebase'])
 	   	 	Name: "NUSBot"
 	   	 }
 	   	 $scope.goToChat = function(){
-	   	 		ChatService.setOtherUser($scope.BOT);
-		 		$state.go('NUSTalk.chatDetails');
+	   	 		//ChatService.setOtherUser($scope.BOT);
+		 		$state.go('NUSTalk.bot');
 	   	 }
 
 	   	 $scope.search = function(){
@@ -273,7 +315,8 @@ angular.module('NUSTalk.controllers',['firebase'])
 						  'lastText': data.val().lastText.message || (data.val().lastText.imageUrl?"Image":"Send a message..."),
 						  'threadID': data.key,
 						  'type': data.val().type,
-						  'icon': $scope.icon || data.val().icon || './img/default-user.png'}
+						  'icon': $scope.icon || data.val().icon || './img/default-user.png',
+						  'read': data.val().read}
 						);	
 					}), function(error){
 						$scope.chats.unshift(
@@ -282,7 +325,8 @@ angular.module('NUSTalk.controllers',['firebase'])
 						  'lastText': data.val().lastText.message || (data.val().lastText.imageUrl?"Image":"Send a message..."),
 						  'threadID': data.key,
 						  'type': data.val().type,
-						  'icon': data.val().icon || './img/default-user.png'}
+						  'icon': data.val().icon || './img/default-user.png',
+						  'read': data.val().read}
 						);	
 					};
 			});
@@ -593,7 +637,8 @@ angular.module('NUSTalk.controllers',['firebase'])
 				});
 			}	
 		}
-		
+
+		$scope.userRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('read').set(true);
 
 		$scope.messages = [];
 
@@ -623,8 +668,10 @@ angular.module('NUSTalk.controllers',['firebase'])
 			$scope.threadsRef.child($scope.currentThread).child('messages').push(data);
 			$scope.userRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('lastText').set(data);
 			$scope.userRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('lastTextTime').set(data.time);
+			$scope.userRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('read').set(true);
 			$scope.otheruserRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('lastText').set(data);
-			$scope.otheruserRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('lastTextTime').set(data.time);		
+			$scope.otheruserRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('lastTextTime').set(data.time);
+			$scope.otheruserRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('read').set(false);
 			$scope.otheruserRef.child('token').once('value', function(snapshot){
 				var otherToken = snapshot.val();
 				console.log('otherToken', otherToken);
@@ -994,6 +1041,7 @@ angular.module('NUSTalk.controllers',['firebase'])
     		$ionicScrollDelegate.scrollBottom();
   		});
 
+  		
 		if($scope.currentThread == ""){
 
 			console.log('New chat');
@@ -1026,6 +1074,9 @@ angular.module('NUSTalk.controllers',['firebase'])
 		console.log($scope.group.name, $scope.group.members);
 		$scope.messages = [];
 
+		$scope.userRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('read').set(true);
+
+
 			$scope.messagesRef = firebase.database().ref('threads/' + ModuleService.getCurrentModule().CourseCode + '/' + $scope.currentThread + '/messages');
 			
 			$scope.messagesRef.on('child_added', function(data) {
@@ -1055,7 +1106,9 @@ angular.module('NUSTalk.controllers',['firebase'])
 					var otheruserRef =  firebase.database().ref('users/' + $scope.group.members[i].UserID);
 					otheruserRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('lastText').set(data);
 					otheruserRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('lastTextTime').set(data.time);
+					otheruserRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('read').set(true);
 					if($scope.group.members[i].UserID != User.getUserId()){
+						otheruserRef.child('threads').child(ModuleService.getCurrentModule().CourseCode).child($scope.currentThread).child('read').set(false);
 						otheruserRef.child('token').once('value', function(snapshot){
 							var otherToken = snapshot.val();
 							console.log('otherToken', otherToken);
@@ -1253,6 +1306,113 @@ angular.module('NUSTalk.controllers',['firebase'])
 			      	console.log('error getting photos');
 			    });
 			};
+	})
+
+	.controller('BotCtrl', function($scope, $http, $state, $rootScope, ChatService, Firebase, User, $ionicScrollDelegate, $timeout, $rootScope, ModuleService, $cordovaImagePicker, $ionicModal, BotService){
+
+		$scope.inputMessage = {};
+		$scope.userID = User.getUserId();
+
+		$timeout(function() {
+    		$ionicScrollDelegate.scrollBottom();
+  		});
+
+		$scope.threadRef = firebase.database().ref('threads/BOT/' + User.getUserId());
+		$scope.messages = [];
+
+		$scope.messagesRef = firebase.database().ref('threads/BOT/' + User.getUserId() + '/messages');
+			
+			$scope.messagesRef.on('child_added', function(data) {
+				console.log('new message'+ data.val().text);
+				$scope.messages.push(data.val());	
+				$timeout(function() {
+	    			$ionicScrollDelegate.scrollBottom();
+		  		});
+			});
+
+		$scope.threadRef.once('value', function(snapshot){
+			$scope.watermark = snapshot.val().watermark;
+			console.log('watermark', $scope.watermark);
+		})
+
+		/*var interval = setInterval(function() {	
+			   	 	$http({
+						method: "GET",
+						url: "https://directline.botframework.com/api/conversations/" + BotService.getConID() + "/messages?watermark=" + $scope.watermark,
+						headers: {
+					 	   'Authorization': 'BotConnector ' + 'SfB4DslT2ew.cwA.F64.3AfjhRhOOZsoXoONOYDquiVTSn0NUhDcuxNsYxqmAM8'
+					 	},
+					}).then(function(response){
+				   	 	console.log(response);
+				   	 	if($scope.watermark == response.data.watermark){
+				   	 		clearInterval(interval);
+				   	 		$scope.threadRef.child('watermark').set($scope.watermark);
+				   	 	}
+				   	 	else{
+				   	 		$scope.watermark = response.data.watermark;
+				   	 		var chat = response.data.messages;
+				   	 		console.log(chat);
+				   	 		for(var i=0;i<chat.length;++i){
+				   	 			$scope.threadRef.child('messages').push(chat[i]);
+				   	 		}
+				   	 	}
+				   	});	
+				}, 1000);*/
+
+
+			 
+		$scope.sendMessage = function(msg){
+
+			$ionicScrollDelegate.scrollBottom(true);
+			var currentTime = new Date();
+			var Message = {
+				from: User.getUserId(),
+				text: msg,
+			};
+
+			console.log(Message);	
+
+			$http({
+				method: "POST",
+				url: "https://directline.botframework.com/api/conversations/" + BotService.getConID() + "/messages",
+				headers: {
+			 	   'Authorization': 'BotConnector ' + 'SfB4DslT2ew.cwA.F64.3AfjhRhOOZsoXoONOYDquiVTSn0NUhDcuxNsYxqmAM8'
+			 	},
+				data: {
+				    'text': Message.text,
+				    'from': User.getUserId() 
+				},
+			}).then(function(data){
+		   	 	console.log(data);	
+		   	 	var interval = setInterval(function() {	
+			   	 	$http({
+						method: "GET",
+						url: "https://directline.botframework.com/api/conversations/" + BotService.getConID() + "/messages?watermark=" + $scope.watermark,
+						headers: {
+					 	   'Authorization': 'BotConnector ' + 'SfB4DslT2ew.cwA.F64.3AfjhRhOOZsoXoONOYDquiVTSn0NUhDcuxNsYxqmAM8'
+					 	},
+					}).then(function(response){
+				   	 	console.log(response);
+				   	 	if($scope.watermark == response.data.watermark){
+				   	 		$scope.threadRef.child('watermark').set($scope.watermark);
+				   	 		clearInterval(interval);
+				   	 	}
+				   	 	else{
+				   	 		$scope.watermark = response.data.watermark;
+				   	 		var chat = response.data.messages;
+				   	 		console.log(chat);
+				   	 		for(var i=0;i<chat.length;++i){
+				   	 			if(chat[i].from != Message.from)
+				   	 				$scope.threadRef.child('messages').push(chat[i]);
+				   	 		}
+				   	 	}
+				   	});	
+				}, 1000);
+
+		   	 });		
+			$scope.threadRef.child('messages').push(Message);
+			$scope.inputMessage = {};
+		};	
 
 
 	})

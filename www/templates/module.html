@@ -22,13 +22,21 @@
     </ion-refresher>
 
     <ion-list class="chats-list" >
-      <ion-item class="item item-avatar-left" ng-repeat="chat in chats | filter:searchChat" ng-click ='goToChat(chat)'>
+      <strong><ion-item class="item item-avatar-left" ng-repeat="chat in chats | filter:searchChat" ng-click ='goToChat(chat)' ng-if=" !chat.read ">
         <img src="{{chat.icon}}">
         <h2>{{ chat.Name }}</h2>
         <p>{{ chat.lastText }}</p>
         <span class="badge badge-positive"></span>
         <sup style="font-size:15px; color:black; opacity: 0.2;"> {{ chat.time }} </sup>
-        <ion-option-button class="button-positive">Delete</ion-option-button>
+        <ion-option-button class="button-positive" ng-click="deleteChat(chat)">Delete</ion-option-button>
+      </ion-item></strong>
+      <ion-item class="item item-avatar-left" ng-repeat="chat in chats | filter:searchChat" ng-click ='goToChat(chat)' ng-if=" chat.read ">
+        <img src="{{chat.icon}}">
+        <h2>{{ chat.Name }}</h2>
+        <p>{{ chat.lastText }}</p>
+        <span class="badge badge-positive"></span>
+        <sup style="font-size:15px; color:black; opacity: 0.2;"> {{ chat.time }} </sup>
+        <ion-option-button class="button-positive" ng-click="deleteChat(chat)">Delete</ion-option-button>
       </ion-item>
     </ion-list>
   </ion-content>

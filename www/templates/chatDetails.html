@@ -1,4 +1,4 @@
-b<ion-view view-title="{{otherUser.Name || otherUser.User.Name}}">
+<ion-view view-title="{{otherUser.Name || otherUser.User.Name}}">
 	
 	<ion-nav-bar class="bar-positive">
   <ion-nav-back-button class="button-clear">
@@ -11,10 +11,7 @@ b<ion-view view-title="{{otherUser.Name || otherUser.User.Name}}">
 
   	</ion-nav-bar>
   
-	<ion-content class="content-stable"
-                 on-swipe-left="hideTime = false"
-                 on-swipe-right="hideTime = true" id='messages'
-                 >
+	<ion-content class="content-stable" id='messages'>
 
     
 		<div ng-repeat="message in messages"

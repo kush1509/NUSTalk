@@ -1,0 +1,42 @@
+<ion-view view-title="NUSTalk BOT">
+	
+	<ion-nav-bar class="bar-positive">
+	  <ion-nav-back-button class="button-clear">
+	    <i class="ion-chevron-left"></i> Home
+	  </ion-nav-back-button>
+	</ion-nav-bar>
+  
+	<ion-content class="content-stable" id='messages'>
+
+    
+		<div ng-repeat="message in messages"
+           ng-class="{other: (message.from != userID)}"
+           class="messages">
+		   
+		   	<div class="message">
+				<span class="msg">
+					{{ message.text }} &nbsp
+					<sub style="font-size:10px; color:black; opacity: 0.2; margin-right:0;"> {{ message.time }} </sub>
+				</span>
+			</div>
+
+			<!--
+			<div class="message" ng-class="{'slide-right': hideTime, '': !hideTime}">
+				<span >{{ message.text }}</span>
+			</div>
+			
+			<div class="time" ng-class="{'slide-right': hideTime,'' : !hideTime}">{{message.time}}</div>
+			-->
+
+		</div>
+		
+	</ion-content>
+	<ion-footer-bar keyboard-attach class="bar-positive ">
+		<form id="formID" name="sendMessageForm" novalidate name="msgForm" class="item-input-inset">
+			<label class="item-input-wrapper item-text-wrap">
+				<input type="text" placeholder="Type your message" ng-model="inputMessage.message"/>
+			</label>
+			<button class="button button-icon button-small ion-paper-airplane" ng-click="sendMessage(inputMessage.message)" ng-disabled="!inputMessage.message || inputMessage.message === ''"></button>	
+		<form>
+    </ion-footer-bar>     
+</ion-view>

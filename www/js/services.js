@@ -216,5 +216,32 @@ angular.module('NUSTalk.services',['firebase'])
 			getIcon: getIcon,
 			getGroup: getGroup
 		}
+	})
 
+	.service('BotService', function(){
+
+		var token = "";
+		var conID = "";
+
+		var setToken = function(data){
+			token = data;
+		};
+
+		var getToken = function(){
+		    return token;
+ 	    };
+
+ 	    var setConID = function(data){
+			conID = data;
+		};
+
+		var getConID = function(){
+		    return conID;
+ 	    };
+		return{
+			setToken: setToken,
+			getToken: getToken,
+			setConID: setConID,
+			getConID: getConID
+		}
 	})

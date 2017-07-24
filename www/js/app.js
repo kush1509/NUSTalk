@@ -66,7 +66,7 @@ angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'n
         templateUrl: 'templates/profile.html',
         controller: 'ProfileCtrl'
       })
-      
+    
       .state('NUSTalk', {
         url: '/NUSTalk',
         abstract: true,
@@ -82,6 +82,17 @@ angular.module('NUSTalk', ['ionic','NUSTalk.services', 'NUSTalk.controllers', 'n
           'NUSTalkSideMenu': {
             templateUrl: 'templates/homepage.html',
             controller: 'HomeController'
+          }
+        }
+      })
+
+      .state('NUSTalk.bot', {
+        url: '/home',
+        cache: false,
+        views: {
+          'NUSTalkSideMenu': {
+            templateUrl: 'templates/bot.html',
+            controller: 'BotCtrl'
           }
         }
       })
